@@ -85,8 +85,8 @@ public class PathParser {
 				p = new HenshinPath(content.substring(1), file.getProject());
 			else 
 				p = paths.getPath(content);
-
-			raiseError(!p.initResourceSet(true), "Resourceset Not initialized");
+			if(p.exists)
+				raiseError(!p.initResourceSet(true), "Resourceset Not initialized");
 			paths.addPath(p, identifier);
 			return true;
 		}
@@ -99,7 +99,8 @@ public class PathParser {
 			if(content.startsWith(":"))
 				content = paths.getPathAsString(content);
 
-			raiseError(!resource.initModule(content), "Init Module dont worked");
+			if(resource.exists && resource.resource())
+				raiseError(!resource.initModule(content), "Init Module dont worked");
 			paths.addPath(resource, identifier);
 
 			return true;
@@ -114,7 +115,8 @@ public class PathParser {
 			if(content.startsWith(":"))
 				content = paths.getPathAsString(content);
 
-			raiseError(!resourceHP.initGraph(content), "Init Graph dont worked");
+			if(resourceHP.exists && resourceHP.module())
+				raiseError(!resourceHP.initGraph(content), "Init Graph dont worked");
 			paths.addPath(resourceHP, identifier);
 
 			return true;
@@ -124,7 +126,8 @@ public class PathParser {
 		if(content.length()!=0){
 			identifier = getMatchedStrings(row, "\\w+\\.setEGraph\\(", "f\\.setEGraph\\(");
 			HenshinPath app = paths.getPath(content);
-			raiseError(!app.initApp(), "Init app dont worked");
+			if(app.exists && app.graph())
+				raiseError(!app.initApp(), "Init app dont worked");
 			paths.addPath(app, identifier);
 
 			return true;
@@ -137,7 +140,8 @@ public class PathParser {
 			if(content.startsWith(":"))
 				content = paths.getPathAsString(content.substring(1));
 			HenshinPath app = paths.getPath(identifier);
-			raiseError(!app.initRule(content), "Init rule dont worked");
+			if(app.exists && app.app())
+				raiseError(!app.initRule(content), "Init rule dont worked");
 			paths.addPath(app, identifier);
 
 			return true;
@@ -158,7 +162,8 @@ public class PathParser {
 			if(content.startsWith(":"))
 				content = paths.getPathAsString(content.substring(1));
 			HenshinPath app = paths.getPath(identifier);
-			raiseError(!app.isParameter(content, value), "Parameter " + content + " with value " + stringValue + " is not a parameter");
+			if(app.exists && app.rule())
+				raiseError(!app.isParameter(content, value), "Parameter " + content + " with value " + stringValue + " is not a parameter");
 			paths.addPath(app, identifier);
 
 			return true;
@@ -171,7 +176,8 @@ public class PathParser {
 			if(content.startsWith(":"))
 				content = paths.getPathAsString(content.substring(1));
 			HenshinPath app = paths.getPath(identifier);
-			raiseError(!app.isResultParameter(content), content + " is not a result rule");
+			if(app.exists && app.rule())
+				raiseError(!app.isResultParameter(content), content + " is not a result rule");
 			paths.addPath(app, identifier);
 
 			return true;

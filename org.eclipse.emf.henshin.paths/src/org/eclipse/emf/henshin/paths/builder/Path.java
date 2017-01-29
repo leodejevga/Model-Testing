@@ -26,9 +26,7 @@ public class Path {
 	public String getPath(){
 		return path;
 	}
-	public boolean exists(){
-		return exists;
-	}
+
 	public boolean exists(String path){
 		return project.findMember(this.path + "/" + path) != null;
 	}

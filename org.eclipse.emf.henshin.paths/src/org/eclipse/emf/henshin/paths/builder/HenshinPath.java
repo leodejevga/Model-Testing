@@ -117,8 +117,27 @@ public class HenshinPath extends Path {
 		}
 		return false;
 	}
+	public boolean resource(){
+		return resourceSet!=null;
+	}
+	public boolean app(){
+		return app!=null;
+	}
+	public boolean graph(){
+		return graph!=null;
+	}
+	public boolean module(){
+		return module!=null;
+	}
+	public boolean engine() {
+		return engine!=null;
+	}
+	public boolean rule(){
+		return initReady >= 2;
+	}
+	
 	@Override
 	public String toString() {
-		return super.toString() + (resourceSet!=null?":rSet":"") + (module!=null?":module":"") + (graph!=null?":graph":"") + (engine!=null?":engine":"") + (app!=null?":app":"");
+		return super.toString() + (resource()?":rSet":"") + (module()?":module":"") + (graph()?":graph":"") + (engine()?":engine":"") + (app()?":app":"");
 	}
 }
