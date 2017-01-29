@@ -7,3 +7,8 @@ Require-Bundle: org.eclipse.core.resources,
  org.eclipse.core.runtime,
  org.eclipse.ui
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Import-Package: org.eclipse.emf.ecore.resource,
+ org.eclipse.emf.henshin.interpreter,
+ org.eclipse.emf.henshin.interpreter.impl,
+ org.eclipse.emf.henshin.model,
+ org.eclipse.emf.henshin.model.resource

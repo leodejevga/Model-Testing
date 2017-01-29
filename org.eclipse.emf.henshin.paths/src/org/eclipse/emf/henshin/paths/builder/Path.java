@@ -1,71 +1,39 @@
 package org.eclipse.emf.henshin.paths.builder;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-
 import org.eclipse.core.resources.IProject;
 
 public class Path {
-	private IProject project;
-	private List<Map<String, String>> entries;
-	private int thread;
+	protected String path;
+	protected boolean exists;
+	protected IProject project;
 
-
-	public Path(IProject project){
-		this.entries = new ArrayList<Map<String,String>>();
-		this.entries.add(new HashMap<String, String>());
-		thread = 0;
-		this.project = project;
-	}
-	public Path(String path, String identifier, IProject project){
-		this.entries = new ArrayList<Map<String,String>>();
-		this.entries.add(new HashMap<String, String>());
-		entries.get(thread).put(identifier, path);
+	public Path(String path, IProject project){
+		this.path = path;
+		this.exists = project.findMember(this.path) != null;
 		this.project = project;
 	}
 
-	public boolean exists(String path){
-		return project.findMember(path.replaceAll("\"",	""))!=null;
+	public boolean changePath(String path){
+		this.path = path;
+		exists = project.findMember(this.path) != null;
+		return exists;
 	}
-
-	public String getPath(String identifier){
-		String result;
-		for(Map<String,String> m : entries){
-			result = m.get(identifier);
-			if(result!=null)
-				return result;
-		}
-		
-		return "";
-	}
-	
 	public boolean addPath(String path){
-		return addPath(path, null);
+		this.path += "/" + path;
+		exists = project.findMember(this.path) != null;
+		return exists;
 	}
-	
-	public boolean addPath(String path, String identifier){
-		if(identifier!=null)
-			if(path.contains("\""))
-				this.entries.get(thread).put(identifier, path.replaceAll("\"", ""));
-			else
-				this.entries.get(thread).put(identifier, path);
-		return exists(entries.get(thread).get(identifier));
+	public String getPath(){
+		return path;
 	}
-	
-	public void newThread(){
-		entries.add(new HashMap<String, String>());
-		thread = entries.size()-1;
+	public boolean exists(){
+		return exists;
 	}
-	
-	public boolean prevThread(){
-		if(thread!=0){
-			thread--;
-			return true;
-		}
-		return false;
+	public boolean exists(String path){
+		return project.findMember(this.path + "/" + path) != null;
 	}
-	
+	@Override
+	public String toString() {
+		return exists + ":" + path;
+	}
 }
