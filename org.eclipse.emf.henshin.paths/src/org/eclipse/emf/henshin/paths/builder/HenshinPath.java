@@ -13,6 +13,7 @@ import org.eclipse.emf.henshin.interpreter.impl.EGraphImpl;
 import org.eclipse.emf.henshin.interpreter.impl.EngineImpl;
 import org.eclipse.emf.henshin.interpreter.impl.UnitApplicationImpl;
 import org.eclipse.emf.henshin.model.Module;
+import org.eclipse.emf.henshin.model.Unit;
 import org.eclipse.emf.henshin.model.resource.HenshinResourceSet;
 
 public class HenshinPath extends Path {
@@ -81,10 +82,10 @@ public class HenshinPath extends Path {
 		return false;
 	}
 
-	public boolean initRule(String rule) {
+	public boolean initRule(String rule, Unit unit) {
 		if (initReady > 0) {
 			try {
-				app.setUnit(module.getUnit(rule));
+				app.setUnit(unit);
 				initReady = 2;
 				return true;
 			} catch (Exception e) {
@@ -92,6 +93,13 @@ public class HenshinPath extends Path {
 			}
 		}
 		return false;
+	}
+	
+	public Unit getUnit(String unit){
+		if (initReady > 0) {
+			module.getUnit(unit);
+		}
+		return null;
 	}
 
 	public boolean isParameter(String parameter, Object value) {
