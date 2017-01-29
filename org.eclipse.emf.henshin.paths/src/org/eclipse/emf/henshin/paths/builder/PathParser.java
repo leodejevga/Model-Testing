@@ -86,9 +86,13 @@ public class PathParser {
 				p = new HenshinPath(content.substring(1), file.getProject());
 			else 
 				p = paths.getPath(content);
-			if(p.exists)
-				raiseError(!p.initResourceSet(true), "Resourceset Not initialized");
-			paths.addPath(p, identifier);
+			if(!p.exists && content.startsWith(":")){
+				raiseError(true, "Path not found");
+				return true;
+			}
+			HenshinPath n = p.clone();
+			raiseError(!n.initResourceSet(true), "Resourceset Not initialized");
+			paths.addPath(n, identifier);
 			return true;
 		}
 		content = getMatchedStrings(row, "getModule\\(\".+\"", "lgetModule\\(\"").replace("\"", "");
@@ -100,9 +104,10 @@ public class PathParser {
 			if(content.startsWith(":"))
 				content = paths.getPathAsString(content);
 
-			if(resource.resource())
-				raiseError(!resource.initModule(content), "Init Module dont worked");
-			paths.addPath(resource, identifier);
+			HenshinPath temp = resource.clone();
+			if(temp.exists && temp.resource())
+				raiseError(!temp.initModule(content), "Init Module dont worked");
+			paths.addPath(temp, identifier);
 
 			return true;
 		}
@@ -116,9 +121,10 @@ public class PathParser {
 			if(content.startsWith(":"))
 				content = paths.getPathAsString(content);
 
-			if(resourceHP.module())
-				raiseError(!resourceHP.initGraph(content), "Init Graph dont worked");
-			paths.addPath(resourceHP, identifier);
+			HenshinPath temp = resourceHP.clone();
+			if(temp.exists && temp.resource())
+				raiseError(!temp.initGraph(content), "Init Graph dont worked");
+			paths.addPath(temp, identifier);
 
 			return true;
 		}
@@ -127,9 +133,10 @@ public class PathParser {
 		if(content.length()!=0){
 			identifier = getMatchedStrings(row, "\\w+\\.setEGraph\\(", "f\\.setEGraph\\(");
 			HenshinPath app = paths.getPath(content);
-			if(app.graph())
-				raiseError(!app.initApp(), "Init app dont worked");
-			paths.addPath(app, identifier);
+			HenshinPath temp = app.clone();
+			if(temp.graph())
+				raiseError(!temp.initApp(), "Init app dont worked");
+			paths.addPath(temp, identifier);
 
 			return true;
 		}
@@ -141,11 +148,14 @@ public class PathParser {
 			if(content.startsWith(":"))
 				content = paths.getPathAsString(content.substring(1));
 			HenshinPath app = paths.getPath(identifier);
-			Unit unit = paths.getPath(getMatchedStrings(row, "\\w+\\.getUnit", "f\\.getUnit")).getUnit(content);
-			if(unit == null)
+			HenshinPath module = paths.getPath(getMatchedStrings(row, "\\w+\\.getUnit", "f\\.getUnit"));
+			Unit unit = module.getUnit(content);
+			if(module.module() && unit == null){
 				raiseError(true, "The Module dont has Unit " + content);
-			if(app.app())
-				raiseError(!app.initRule(content, unit), "Init rule dont worked");
+				return true;
+			}
+			if(app.app() && unit!=null)
+				raiseError(!app.initRule(unit), "The initialization of Rule " + Rule + " was not successfull");
 			paths.addPath(app, identifier);
 
 			return true;
@@ -167,7 +177,7 @@ public class PathParser {
 				content = paths.getPathAsString(content.substring(1));
 			HenshinPath app = paths.getPath(identifier);
 			if(app.rule())
-				raiseError(!app.isParameter(content, value), "Parameter " + content + " is not a parameter");
+				raiseError(!app.isParameter(content, value), "Parameter \"" + content + "\" is not a parameter of " + identifier);
 			paths.addPath(app, identifier);
 
 			return true;
@@ -180,9 +190,10 @@ public class PathParser {
 			if(content.startsWith(":"))
 				content = paths.getPathAsString(content.substring(1));
 			HenshinPath app = paths.getPath(identifier);
-			if(app.rule())
-				raiseError(!app.isResultParameter(content), content + " is not a result rule");
-			paths.addPath(app, identifier);
+			HenshinPath temp = app.clone();
+			if(temp.rule())
+				raiseError(!temp.isResultParameter(content), content + " is not a result rule");
+			paths.addPath(temp, identifier);
 
 			return true;
 		}
@@ -224,11 +235,19 @@ public class PathParser {
 	private boolean raiseError(boolean error, String row) {
 		if (error)
 			try {
-				System.out.println("Error raised: " + row);
 				reporter.error(new PathException(row, line));
 			} catch (SAXException e) {
 				e.printStackTrace();
 			}
 		return error;
+	}
+	private boolean raiseWarning(boolean warning, String row) {
+		if (warning)
+			try {
+				reporter.warning(new PathException(row, line));
+			} catch (SAXException e) {
+				e.printStackTrace();
+			}
+		return warning;
 	}
 }

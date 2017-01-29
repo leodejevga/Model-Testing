@@ -23,6 +23,9 @@ public class HenshinPath extends Path {
 	private EGraph graph;
 	private UnitApplication app;
 	private int initReady = 0;
+	private Unit rule;
+	private String xmi;
+	private String henshin;
 
 	public HenshinPath(String path, IProject project) {
 		super(path, project);
@@ -39,12 +42,12 @@ public class HenshinPath extends Path {
 			} catch(Exception e){
 				return false;
 			}
-		else
-			return false;
+
 		return true;
 	}
 
 	public boolean initModule(String henshin) {
+		this.henshin = henshin;
 		if(exists(henshin) && resourceSet != null && henshin.endsWith(".henshin"))
 			try {
 				module = resourceSet.getModule(henshin, false);
@@ -57,6 +60,7 @@ public class HenshinPath extends Path {
 	}
 
 	public boolean initGraph(String xmi) {
+		this.xmi = xmi;
 		if(exists(xmi) && resourceSet != null && xmi.endsWith(".xmi"))
 			try {
 				graph = new EGraphImpl(resourceSet.getResource(xmi));
@@ -69,7 +73,7 @@ public class HenshinPath extends Path {
 	}
 
 	public boolean initApp() {
-		if (graph != null && module != null) {
+		if (graph != null ) {
 			try {
 				engine = new EngineImpl();
 				app = new UnitApplicationImpl(engine);
@@ -82,7 +86,8 @@ public class HenshinPath extends Path {
 		return false;
 	}
 
-	public boolean initRule(String rule, Unit unit) {
+	public boolean initRule(Unit unit) {
+		this.rule = unit;
 		if (initReady > 0) {
 			try {
 				app.setUnit(unit);
@@ -96,8 +101,8 @@ public class HenshinPath extends Path {
 	}
 	
 	public Unit getUnit(String unit){
-		if (initReady > 0) {
-			module.getUnit(unit);
+		if (module !=null) {
+			return module.getUnit(unit);
 		}
 		return null;
 	}
@@ -142,6 +147,21 @@ public class HenshinPath extends Path {
 	}
 	public boolean rule(){
 		return initReady >= 2;
+	}
+	@Override
+	protected HenshinPath clone() {
+		HenshinPath result = new HenshinPath(path, project);
+		if(resource()) 
+			result.initResourceSet(true);
+		if(module())
+			result.initModule(henshin);
+		if(graph())
+			result.initGraph(xmi);
+		if(app())
+			result.initApp();
+		if(rule())
+			result.initRule(rule);
+		return result;
 	}
 	
 	@Override
