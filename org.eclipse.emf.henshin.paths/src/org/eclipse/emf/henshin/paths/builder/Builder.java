@@ -61,15 +61,15 @@ public class Builder extends IncrementalProjectBuilder {
 			Builder.this.addMarker(file, message + e.getMessage(), e.getLineNumber(), severity);
 		}
 
-		public void error(PathException exception) throws SAXException {
+		public void error(PathException exception) {
 			addMarker(exception, "Path Error: ", IMarker.SEVERITY_ERROR);
 		}
 
-		public void fatalError(PathException exception) throws SAXException {
+		public void fatalError(PathException exception) {
 			addMarker(exception, "Path Fatal Error: ", IMarker.SEVERITY_ERROR);
 		}
 
-		public void warning(PathException exception) throws SAXException {
+		public void warning(PathException exception) {
 			addMarker(exception, "Path Warning: ", IMarker.SEVERITY_WARNING);
 		}
 	}

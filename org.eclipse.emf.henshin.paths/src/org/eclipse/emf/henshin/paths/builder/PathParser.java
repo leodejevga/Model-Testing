@@ -7,8 +7,10 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.eclipse.emf.ecore.EClassifier;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.emf.henshin.model.ParameterKind;
 import org.eclipse.emf.henshin.model.Unit;
 import org.eclipse.emf.henshin.paths.builder.Builder.PathErrorHandler;
 import org.xml.sax.SAXException;
@@ -23,7 +25,7 @@ public class PathParser {
 	private boolean plus = false;
 	private PathHandler paths;
 
-	public void parse(IFile file, PathErrorHandler reporter) throws IOException, SAXException, CoreException {
+	public void parse(IFile file, PathErrorHandler reporter) throws IOException, CoreException {
 		paths = new PathHandler(file.getProject());
 		this.file = file;
 		this.reporter = reporter;
@@ -68,7 +70,7 @@ public class PathParser {
 			if (!row.contains(" final ") && !henshinPath && path.contains("\"") && (path.contains("/") || path.contains("."))){
 				HenshinPath p = new HenshinPath(path.replaceAll("\"", ""), file.getProject());
 				paths.addPath(p, identifier);
-				raiseError(!paths.getPath(identifier).exists, "Path not Found");
+				raiseError(!paths.getPath(identifier).exists(), "Path not Found");
 			}
 			else if(!henshinPath)
 				paths.addPath(path, identifier);
@@ -86,7 +88,7 @@ public class PathParser {
 				p = new HenshinPath(content.substring(1), file.getProject());
 			else 
 				p = paths.getPath(content);
-			if(!p.exists && content.startsWith(":")){
+			if(!p.exists() && content.startsWith(":")){
 				raiseError(true, "Path not found");
 				return true;
 			}
@@ -105,7 +107,7 @@ public class PathParser {
 				content = paths.getPathAsString(content);
 
 			HenshinPath temp = resource.clone();
-			if(temp.exists && temp.resource())
+			if(temp.exists() && temp.resource())
 				raiseError(!temp.initModule(content), "Init Module dont worked");
 			paths.addPath(temp, identifier);
 
@@ -122,7 +124,7 @@ public class PathParser {
 				content = paths.getPathAsString(content);
 
 			HenshinPath temp = resourceHP.clone();
-			if(temp.exists && temp.resource())
+			if(temp.exists() && temp.resource())
 				raiseError(!temp.initGraph(content), "Init Graph dont worked");
 			paths.addPath(temp, identifier);
 
@@ -155,7 +157,7 @@ public class PathParser {
 				return true;
 			}
 			if(app.app() && unit!=null)
-				raiseError(!app.initRule(unit), "The initialization of Rule " + Rule + " was not successfull");
+				raiseError(!app.initRule(unit), "The initialization of Rule " + unit.getName() + " was not successfull");
 			paths.addPath(app, identifier);
 
 			return true;
@@ -164,20 +166,20 @@ public class PathParser {
 		content = content.length()==0? ":" + getMatchedStrings(row, "\\.setParameterValue\\(\\w+", "l\\.setParameterValue\\("):content;
 		if(content.length()!=0 && !content.equals(":")){
 			identifier = getMatchedStrings(row, "\\w+\\.setParameterValue\\(", "f\\.setParameterValue\\(");
-			String stringValue = getMatchedStrings(row, "\\.setParameterValue\\(.+\\)", "l\\.setParameterValue\\(.+, ");
-			stringValue = stringValue.substring(0, stringValue.length()-1);
-			Object value;
-			if(stringValue.contains("\""))
-				value = stringValue.replaceAll("\"", "");
-			else if(stringValue.contains("d"))
-				value = Double.parseDouble(stringValue);
-			else
-				value = Integer.parseInt(stringValue);
+			String value = getMatchedStrings(row, "\\.setParameterValue\\(.+\\)", "l\\.setParameterValue\\(.+, ");
+			value = value.substring(0, value.length()-1);
+			String type=null;
+			if(value.contains("\""))
+				type = "EString";
+			else if(value.contains("d"))
+				type = "EDouble";
+			else if(value.split("[a-zA-Z]").length==1)
+				type = "EInt";
 			if(content.startsWith(":"))
 				content = paths.getPathAsString(content.substring(1));
 			HenshinPath app = paths.getPath(identifier);
 			if(app.rule())
-				raiseError(!app.isParameter(content, value), "Parameter \"" + content + "\" is not a parameter of " + identifier);
+				raiseError(!app.isParameter(content, value, type, null), "Parameter \"" + content + "\" is not a parameter of " + identifier);
 			paths.addPath(app, identifier);
 
 			return true;
@@ -192,7 +194,7 @@ public class PathParser {
 			HenshinPath app = paths.getPath(identifier);
 			HenshinPath temp = app.clone();
 			if(temp.rule())
-				raiseError(!temp.isResultParameter(content), content + " is not a result rule");
+				raiseError(!temp.isOutParameter(content), content + " is not a result rule");
 			paths.addPath(temp, identifier);
 
 			return true;
@@ -234,20 +236,12 @@ public class PathParser {
 
 	private boolean raiseError(boolean error, String row) {
 		if (error)
-			try {
-				reporter.error(new PathException(row, line));
-			} catch (SAXException e) {
-				e.printStackTrace();
-			}
+			reporter.error(new PathException(row, line));
 		return error;
 	}
 	private boolean raiseWarning(boolean warning, String row) {
 		if (warning)
-			try {
-				reporter.warning(new PathException(row, line));
-			} catch (SAXException e) {
-				e.printStackTrace();
-			}
+			reporter.warning(new PathException(row, line));
 		return warning;
 	}
 }

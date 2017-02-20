@@ -1,37 +1,38 @@
 package org.eclipse.emf.henshin.paths.builder;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 
 public class Path {
-	protected String path;
-	protected boolean exists;
+	private String stringPath;
+	protected IResource path;
 	protected IProject project;
 
 	public Path(String path, IProject project){
-		this.path = path;
-		this.exists = project.findMember(this.path) != null;
+		this.stringPath = path;
+		this.path = project.findMember(path);
 		this.project = project;
 	}
 
 	public boolean changePath(String path){
-		this.path = path;
-		exists = project.findMember(this.path) != null;
-		return exists;
+		this.stringPath = path;
+		this.path = project.findMember(path);
+		return path!=null;
 	}
 	public boolean addPath(String path){
-		this.path += "/" + path;
-		exists = project.findMember(this.path) != null;
-		return exists;
+		this.stringPath += "/" + path;
+		this.path = project.findMember(this.stringPath);
+		return this.path!=null;
 	}
 	public String getPath(){
-		return path;
+		return stringPath;
 	}
 
-	public boolean exists(String path){
-		return project.findMember(this.path + "/" + path) != null;
+	public boolean exists(){
+		return path!=null;
 	}
 	@Override
 	public String toString() {
-		return exists + ":" + path;
+		return exists() + ":" + path;
 	}
 }

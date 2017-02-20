@@ -1,11 +1,9 @@
 package org.eclipse.emf.henshin.paths.builder;
 
-import java.io.File;
-import java.net.URL;
-
+//import java.io.File;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.runtime.FileLocator;
-import org.eclipse.emf.henshin.interpreter.Assignment;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.emf.ecore.EClassifier;
 import org.eclipse.emf.henshin.interpreter.EGraph;
 import org.eclipse.emf.henshin.interpreter.Engine;
 import org.eclipse.emf.henshin.interpreter.UnitApplication;
@@ -13,6 +11,8 @@ import org.eclipse.emf.henshin.interpreter.impl.EGraphImpl;
 import org.eclipse.emf.henshin.interpreter.impl.EngineImpl;
 import org.eclipse.emf.henshin.interpreter.impl.UnitApplicationImpl;
 import org.eclipse.emf.henshin.model.Module;
+import org.eclipse.emf.henshin.model.Parameter;
+import org.eclipse.emf.henshin.model.ParameterKind;
 import org.eclipse.emf.henshin.model.Unit;
 import org.eclipse.emf.henshin.model.resource.HenshinResourceSet;
 
@@ -31,13 +31,15 @@ public class HenshinPath extends Path {
 		super(path, project);
 	}
 	public HenshinPath(Path path) {
-		super(path.path, path.project);
+		super(path.getPath(), path.project);
 	}
 	
 	public boolean initResourceSet(boolean force) {
 		if (force || resourceSet == null)
 			try{
-				String p = project.getRawLocationURI().getPath() + "/" + path;
+				if(path.getType() != IResource.FOLDER)
+					return false;
+				String p = path.getLocation().toOSString();
 				resourceSet = new HenshinResourceSet(p);
 			} catch(Exception e){
 				return false;
@@ -48,7 +50,7 @@ public class HenshinPath extends Path {
 
 	public boolean initModule(String henshin) {
 		this.henshin = henshin;
-		if(exists(henshin) && resourceSet != null && henshin.endsWith(".henshin"))
+		if(resourceSet != null && henshin.endsWith(".henshin"))
 			try {
 				module = resourceSet.getModule(henshin, false);
 			} catch (Exception e) {
@@ -61,7 +63,7 @@ public class HenshinPath extends Path {
 
 	public boolean initGraph(String xmi) {
 		this.xmi = xmi;
-		if(exists(xmi) && resourceSet != null && xmi.endsWith(".xmi"))
+		if(resourceSet != null && xmi.endsWith(".xmi"))
 			try {
 				graph = new EGraphImpl(resourceSet.getResource(xmi));
 			} catch (Exception e) {
@@ -108,8 +110,20 @@ public class HenshinPath extends Path {
 	}
 
 	public boolean isParameter(String parameter, Object value) {
+		return isParameter(parameter, value, null, null);
+	}
+	public boolean isParameter(String parameter, Object value, String type, ParameterKind kind) {
 		if (initReady > 1) {
 			try {
+				Parameter p = app.getUnit().getParameter(parameter);
+				if(p==null)
+					return false;
+				ParameterKind pk = p.getKind();
+				if(kind!=null && pk != kind)
+					return false;
+				String ec = p.getType().getName();
+				if(type!=null && !ec.equals(type))
+					return false;
 				app.setParameterValue(parameter, value);
 				return true;
 			} catch (Exception e) {
@@ -117,19 +131,21 @@ public class HenshinPath extends Path {
 		}
 		return false;
 	}
-	public boolean isResultParameter(String parameter) {
+	public boolean isOutParameter(String parameter) {
 		if (initReady > 1) {
 			try {
-				//TODO: Finde heraus wie man den Kind of Parameter feststellen kann
-//				Object o = app.getResultAssignment();
-//				app.getAssignment().getParameterValues()
-//				Object a = ((Assignment) o).getParameterValue(app.getUnit().getParameter("accountId"));
-				return true;
+				Parameter p = app.getUnit().getParameter(parameter);
+				if(p==null)
+					return false;
+				ParameterKind pk = p.getKind();
+				if(pk == ParameterKind.INOUT || pk == ParameterKind.OUT )
+					return true;
 			} catch (Exception e) {
 			}
 		}
 		return false;
 	}
+
 	public boolean resource(){
 		return resourceSet!=null;
 	}
@@ -150,7 +166,7 @@ public class HenshinPath extends Path {
 	}
 	@Override
 	protected HenshinPath clone() {
-		HenshinPath result = new HenshinPath(path, project);
+		HenshinPath result = new HenshinPath(getPath(), project);
 		if(resource()) 
 			result.initResourceSet(true);
 		if(module())
