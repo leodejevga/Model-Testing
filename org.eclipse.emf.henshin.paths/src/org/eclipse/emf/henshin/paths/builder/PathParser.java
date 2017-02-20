@@ -63,14 +63,15 @@ public class PathParser {
 	private void findPath(String row) {
 		String path = getMatchedStrings(row, "(\"[A-Za-z\\-\\_/\\.]+\"|\\((\\w|\\w+ *, *\\w+)*\\))")
 				.replaceAll("[\\(\\)]+", "");
-		String identifier = getMatchedStrings(row, "([A-Za-z]+)(.*[\\(=])+", "f =", "l ", "f\\.", "f\\(");
+		String identifier = getMatchedStrings(row, "([A-Za-z]+)(.*[\\(=])+", "f *=", "l +", "f\\.", "f\\(");
 		
 		if (!path.equals("") && !identifier.equals("")) {
 			boolean henshinPath = checkHenshin(row);
 			if (!row.contains(" final ") && !henshinPath && path.contains("\"") && (path.contains("/") || path.contains("."))){
 				HenshinPath p = new HenshinPath(path.replaceAll("\"", ""), file.getProject());
 				paths.addPath(p, identifier);
-				raiseError(!paths.getPath(identifier).exists(), "Path not Found");
+				if(!p.exists() && !p.isFile())
+					raiseError(true, "Path not Found");
 			}
 			else if(!henshinPath)
 				paths.addPath(path, identifier);
@@ -104,7 +105,7 @@ public class PathParser {
 			identifier = getMatchedStrings(row, "Module \\w+", "lModule ");
 			HenshinPath resource = paths.getPath(getMatchedStrings(row, "\\w+.getModule\\(", "f.getModule\\("));
 			if(content.startsWith(":"))
-				content = paths.getPathAsString(content);
+				content = paths.getPathAsString(content.substring(1));
 
 			HenshinPath temp = resource.clone();
 			if(temp.exists() && temp.resource())
@@ -121,7 +122,7 @@ public class PathParser {
 			HenshinPath resourceHP = paths.getPath(resource);
 			
 			if(content.startsWith(":"))
-				content = paths.getPathAsString(content);
+				content = paths.getPathAsString(content.substring(1)); 
 
 			HenshinPath temp = resourceHP.clone();
 			if(temp.exists() && temp.resource())
@@ -194,7 +195,7 @@ public class PathParser {
 			HenshinPath app = paths.getPath(identifier);
 			HenshinPath temp = app.clone();
 			if(temp.rule())
-				raiseError(!temp.isOutParameter(content), content + " is not a result rule");
+				raiseError(!temp.isOutParameter(content), "\"" + content + "\" is not a result parameter");
 			paths.addPath(temp, identifier);
 
 			return true;

@@ -33,6 +33,9 @@ public class Path {
 	}
 	@Override
 	public String toString() {
-		return exists() + ":" + path;
+		return exists() + ":" + stringPath;
+	}
+	public boolean isFile() {
+		return path==null && !stringPath.contains("/") || path!=null && path.getType() == IResource.FILE ;
 	}
 }
