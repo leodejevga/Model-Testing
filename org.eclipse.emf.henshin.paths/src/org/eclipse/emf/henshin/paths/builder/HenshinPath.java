@@ -182,6 +182,6 @@ public class HenshinPath extends Path {
 	
 	@Override
 	public String toString() {
-		return super.toString() + (resource()?":rSet":"") + (module()?":module":"") + (graph()?":graph":"") + (engine()?":engine":"") + (app()?":app":"");
+		return super.toString() + (resource()?":rSet":"") + (module()?":module":"") + (graph()?":graph":"") + (engine()?":engine":"") + (app()?":app":"") + "\n";
 	}
 }

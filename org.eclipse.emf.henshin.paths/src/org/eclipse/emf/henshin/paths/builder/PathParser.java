@@ -157,6 +157,8 @@ public class PathParser {
 				raiseError(true, "The Module dont has Unit " + content);
 				return true;
 			}
+
+			raiseError(app==null, identifier + " is not initialized");
 			if(app.app() && unit!=null)
 				raiseError(!app.initRule(unit), "The initialization of Rule " + unit.getName() + " was not successfull");
 			paths.addPath(app, identifier);
@@ -181,6 +183,8 @@ public class PathParser {
 			HenshinPath app = paths.getPath(identifier);
 			if(app.rule())
 				raiseError(!app.isParameter(content, value, type, null), "Parameter \"" + content + "\" is not a parameter of " + identifier);
+			else
+				raiseError(true, "A rule for " + identifier + " is not set yet");
 			paths.addPath(app, identifier);
 
 			return true;
@@ -200,7 +204,6 @@ public class PathParser {
 
 			return true;
 		}
-		
 		return false;
 	}
 
