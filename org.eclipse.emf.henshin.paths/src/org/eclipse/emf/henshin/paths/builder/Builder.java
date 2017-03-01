@@ -2,6 +2,7 @@ package org.eclipse.emf.henshin.paths.builder;
 
 import java.util.Map;
 
+import javax.swing.text.Position;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.eclipse.core.resources.IFile;
@@ -58,7 +59,7 @@ public class Builder extends IncrementalProjectBuilder {
 		}
 
 		private void addMarker(PathException e, String message, int severity) {
-			Builder.this.addMarker(file, message + e.getMessage(), e.getLineNumber(), severity);
+			Builder.this.addMarker(file, message + e.getMessage(), e.getPosition(), severity);
 		}
 
 		public void error(PathException exception) {
@@ -80,17 +81,20 @@ public class Builder extends IncrementalProjectBuilder {
 
 	private PathParser parser;
 
-	private void addMarker(IFile file, String message, int lineNumber,
-			int severity) {
+	private void addMarker(IFile file, String message, ErrorPosition ep, int severity) {
 		try {
 			IMarker marker = file.createMarker(MARKER_TYPE);
 			marker.setAttribute(IMarker.MESSAGE, message);
 			marker.setAttribute(IMarker.SEVERITY, severity);
-			if (lineNumber == -1) {
-				lineNumber = 1;
+			if (ep.line < 0) {
+				ep.line = 1;
 			}
-			marker.setAttribute(IMarker.LINE_NUMBER, lineNumber);
+			
+			marker.setAttribute(IMarker.LINE_NUMBER, ep.line);
+			marker.setAttribute(IMarker.CHAR_START, ep.start); 
+			marker.setAttribute(IMarker.CHAR_END,ep.end);
 		} catch (CoreException e) {
+			System.out.println("Path Error not successfull: " + message);
 		}
 	}
 
@@ -123,6 +127,7 @@ public class Builder extends IncrementalProjectBuilder {
 			try {
 				getParser().parse(file, reporter);
 			} catch (Exception e1) {
+				e1.printStackTrace();
 			}
 		}
 	}

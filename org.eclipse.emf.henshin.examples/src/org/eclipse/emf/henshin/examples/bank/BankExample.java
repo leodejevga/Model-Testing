@@ -34,18 +34,20 @@ public class BankExample {
 	 * @param path Relative path to the model files.
 	 * @param saveResult Whether the result should be saved.
 	 */
-	final static String PATH = "src/org/eclipse/emf/henshin/examples/bank";
+	final static String PATH = "src/org/eclipse/emf/henshin/examples/bank"; 
 	
 	public static void run(String path, boolean saveResult) {
-		path = "src/org/eclipse/emf/henshin/examples/bank";
-		// Create a resource set with a base directory: 
-		HenshinResourceSet r1 = new HenshinResourceSet(path); 
-		HenshinResourceSet r2 = new HenshinResourceSet("src/org/eclipse/emf/henshin/examples/bank"); 
+		path = "src/org/eclipse/emf/henshin/examples/bank2"; 
+		// Create a resource set with a base directory:
+		HenshinResourceSet r2 = new HenshinResourceSet(path); 
+		HenshinResourceSet r1= new HenshinResourceSet("src/org/eclipse/emf/henshin/examples/bank"); 
 		
 		// Load the module:
 		String re = "bank.henshin";
-		Module m1 = r1.getModule("bank.henshin", false);
-		Module m2 = r1.getModule(re, false);
+		Module m1 = r2.getModule("bank.henshins", false);
+		
+		
+		Module m2 = r1.getModule(re, false); 
 
 		// Load the example model into an EGraph:
 		String s= "example-bank.xmi";
@@ -60,9 +62,11 @@ public class BankExample {
 		createAccountApp2.setEGraph(g2);
 	
 		// Creating a new account for Alice...
-		createAccountApp2.setParameterValue("client", "Alice");
+		String client = "clients";
+		createAccountApp2.setUnit(m2.getUnit("createAccount"));
+		createAccountApp2.setParameterValue(client, "Alice");
 		createAccountApp.setUnit(m1.getUnit("createAccount"));
-		createAccountApp.setParameterValue("client", "Alice"); 
+		createAccountApp.setParameterValue("client", "Alice");
 		createAccountApp.setParameterValue("clients", "Alice");
 		createAccountApp.setParameterValue("accountId", 5);
 		createAccountApp.setParameterValue("accountId", "5");
@@ -86,7 +90,7 @@ public class BankExample {
 		
 		// Deleting all accounts of Charles:
 		UnitApplication deleteAccountsApp = new UnitApplicationImpl(engine);
-		deleteAccountsApp.setEGraph(g1);
+		deleteAccountsApp.setEGraph(g1); 
 		deleteAccountsApp.setUnit(m1.getUnit("deleteAllAccounts"));
 		deleteAccountsApp.setParameterValue("client", "Charles");
 		if (!deleteAccountsApp.execute(null)) {

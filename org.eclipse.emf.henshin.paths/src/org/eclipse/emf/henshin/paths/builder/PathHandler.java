@@ -37,7 +37,8 @@ public class PathHandler {
 
 	
 	public String getPathAsString(String identifier) {
-		return entries.get(identifier).getPath();
+		HenshinPath result = entries.get(identifier);
+		return result!=null?result.getPath():null;
 	}
 	public HenshinPath getPath(String identifier) {
 		return entries.get(identifier);
@@ -50,9 +51,9 @@ public class PathHandler {
 	public boolean addPath(HenshinPath path) {
 		return addPath(path, null);
 	}
-	public boolean addPath(String id, String identifier) {
-		if (identifier != null && identifier.length()!=0 && id.length()!=0)
-			this.entries.put(identifier, this.entries.get(id));
+	public boolean addPath(String path, String identifier) {
+		if (identifier != null && identifier.length()!=0 && path.length()!=0)
+			this.entries.put(identifier, this.entries.get(path));
 		else 
 			return false;
 		return true;

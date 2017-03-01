@@ -3,15 +3,15 @@ package org.eclipse.emf.henshin.paths.builder;
 public class PathException extends Exception{
 
 	private static final long serialVersionUID = 1546845184351L;
-	int line = 0;
+	ErrorPosition ep;
 
-	public PathException(String text, int line){
+	public PathException(String text, ErrorPosition ep){
 		super(text);
-		this.line = line;
+		this.ep = ep;
 	}
 	
-	public int getLineNumber(){
-		return line;
+	public ErrorPosition getPosition(){
+		return ep;
 	}
 
 }
