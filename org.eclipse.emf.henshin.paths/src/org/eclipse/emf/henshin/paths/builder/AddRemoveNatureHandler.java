@@ -19,8 +19,7 @@ public class AddRemoveNatureHandler extends AbstractHandler {
 		ISelection selection = HandlerUtil.getCurrentSelection(event);
 		//
 		if (selection instanceof IStructuredSelection) {
-			for (Iterator<?> it = ((IStructuredSelection) selection).iterator(); it
-					.hasNext();) {
+			for (Iterator<?> it = ((IStructuredSelection) selection).iterator(); it.hasNext();) {
 				Object element = it.next();
 				IProject project = null;
 				if (element instanceof IProject) {
@@ -43,6 +42,9 @@ public class AddRemoveNatureHandler extends AbstractHandler {
 
 		return null;
 	}
+	private static void toggleNature(IProject project) throws CoreException {
+		toggleNature(project, true);
+	}
 
 	/**
 	 * Toggles sample nature on a project
@@ -50,7 +52,7 @@ public class AddRemoveNatureHandler extends AbstractHandler {
 	 * @param project
 	 *            to have sample nature added or removed
 	 */
-	private void toggleNature(IProject project) throws CoreException {
+	public static void toggleNature(IProject project, boolean enable) throws CoreException {
 		IProjectDescription description = project.getDescription();
 		String[] natures = description.getNatureIds();
 
@@ -62,16 +64,17 @@ public class AddRemoveNatureHandler extends AbstractHandler {
 				System.arraycopy(natures, i + 1, newNatures, i, natures.length - i - 1);
 				description.setNatureIds(newNatures);
 				project.setDescription(description, null);
-				return;
 			}
 		}
 
 		// Add the nature
-		String[] newNatures = new String[natures.length + 1];
-		System.arraycopy(natures, 0, newNatures, 0, natures.length);
-		newNatures[natures.length] = Nature.NATURE_ID;
-		description.setNatureIds(newNatures);
-		project.setDescription(description, null);
+		if(enable){
+			String[] newNatures = new String[natures.length + 1];
+			System.arraycopy(natures, 0, newNatures, 0, natures.length);
+			newNatures[natures.length] = Nature.NATURE_ID;
+			description.setNatureIds(newNatures);
+			project.setDescription(description, null);
+		}
 	}
 
 }

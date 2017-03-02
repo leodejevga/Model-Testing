@@ -50,7 +50,7 @@ public class PathParser {
 					row = "";
 				}
 				position.line++;
-			} else if ((char) b == '/' && prevb == '/')
+			} else if ((char) b == '/' && prevb == '/' || (char)b == '@')
 				ignoreComment = true;
 			else if (((char) b == '*' && (char) prevb == '/') || ((char) prevb == '*' && (char) b == '/')) {
 				if (!ignoreDoc && row.length() != 0)
@@ -312,7 +312,7 @@ public class PathParser {
 		String result = "";
 
 		for (int i = 0; m.find(); i++) {
-			String r = m.group(i);
+			String r = m.group();
 			if (split != null)
 				for (String s : split) {
 					try{

@@ -38,7 +38,7 @@ public class Nature implements IProjectNature {
 
 	@Override
 	public void deconfigure() throws CoreException {
-		IProjectDescription description = getProject().getDescription();
+		IProjectDescription description = project.getDescription();
 		ICommand[] commands = description.getBuildSpec();
 		project.deleteMarkers(Builder.MARKER_TYPE, true, IResource.DEPTH_INFINITE);
 		for (int i = 0; i < commands.length; ++i) {

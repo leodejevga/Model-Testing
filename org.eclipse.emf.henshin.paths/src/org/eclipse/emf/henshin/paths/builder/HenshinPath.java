@@ -162,7 +162,7 @@ public class HenshinPath extends Path {
 		return engine!=null;
 	}
 	public boolean rule(){
-		return initReady >= 2;
+		return initReady > 1;
 	}
 	@Override
 	protected HenshinPath clone() {
