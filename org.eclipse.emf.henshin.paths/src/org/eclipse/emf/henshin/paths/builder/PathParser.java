@@ -12,6 +12,8 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.emf.henshin.model.Unit;
 import org.eclipse.emf.henshin.paths.builder.Builder.PathErrorHandler;
 import org.eclipse.core.resources.IMarker;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 
 public class PathParser {
 
@@ -241,11 +243,12 @@ public class PathParser {
 		if(content.length()!=0 && !content.equals(":")){
 			
 			String identifier = getMatchedStrings(row, "Module \\w+", "lModule ");
+			if(identifier.length()==0)
+				return false;
 			HenshinPath resource = paths.getPath(getMatchedStrings(row, "\\w+.getModule\\(", "f.getModule\\("));
 			
 			String linkedContent = content.startsWith(":")?paths.getPathAsString(content.substring(1)):content;
 			content = content.startsWith(":")?content.substring(1):content;
-			
 			HenshinPath temp = resource.clone();
 			if(temp.exists() && temp.resource()){
 				position.set(row, content);

@@ -68,7 +68,7 @@ public class BankExample {
 		createAccountApp.setParameterValue("client", "Alice");
 		createAccountApp.setParameterValue("clients", "Alice");
 		createAccountApp.setParameterValue("accountId", 5);
-		createAccountApp.setParameterValue("accountId", "5");
+		createAccountApp.setParameterValue("accountId", "5"); 
 		if (!createAccountApp.execute(null)) { 
 			throw new RuntimeException("Error creating account for Alice");
 		}
