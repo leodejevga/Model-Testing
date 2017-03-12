@@ -8,34 +8,38 @@ public class Path {
 	protected IResource path;
 	protected IProject project;
 
-	public Path(String path, IProject project){
+	public Path(String path, IProject project) {
 		this.stringPath = path;
 		this.path = project.findMember(path);
 		this.project = project;
 	}
 
-	public boolean changePath(String path){
+	public boolean changePath(String path) {
 		this.stringPath = path;
 		this.path = project.findMember(path);
-		return path!=null;
+		return path != null;
 	}
-	public boolean addPath(String path){
+
+	public boolean addPath(String path) {
 		this.stringPath += "/" + path;
 		this.path = project.findMember(this.stringPath);
-		return this.path!=null;
+		return this.path != null;
 	}
-	public String getPath(){
+
+	public String getPath() {
 		return stringPath;
 	}
 
-	public boolean exists(){
-		return path!=null;
+	public boolean exists() {
+		return path != null;
 	}
+
 	@Override
 	public String toString() {
 		return exists() + ":" + stringPath;
 	}
+
 	public boolean isFile() {
-		return path==null && !stringPath.contains("/") || path!=null && path.getType() == IResource.FILE ;
+		return path == null && !stringPath.contains("/") || path != null && path.getType() == IResource.FILE;
 	}
 }

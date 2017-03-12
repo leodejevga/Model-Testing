@@ -25,46 +25,49 @@ public class PathHandler {
 		this.project = project;
 	}
 
-	
 	public boolean exists(String path) {
 		return project.findMember(path.replace("\"", "")) != null;
 	}
+
 	public boolean exists(Path path) {
 		boolean ex = project.findMember(path.getPath()) != null;
 		return ex;
-		//TODO schauen ob rule oder parameter existieren
+		// TODO schauen ob rule oder parameter existieren
 	}
 
-	
 	public String getPathAsString(String identifier) {
 		HenshinPath result = entries.get(identifier);
-		return result!=null?result.getPath():null;
+		return result != null ? result.getPath() : null;
 	}
+
 	public HenshinPath getPath(String identifier) {
 		return entries.get(identifier);
 	}
 
-	
 	public boolean addPath(String path) {
 		return addPath(path, null);
 	}
+
 	public boolean addPath(HenshinPath path) {
 		return addPath(path, null);
 	}
+
 	public boolean addPath(String path, String identifier) {
-		if (identifier != null && identifier.length()!=0 && path.length()!=0)
+		if (identifier != null && identifier.length() != 0 && path.length() != 0)
 			this.entries.put(identifier, this.entries.get(path));
-		else 
+		else
 			return false;
 		return true;
 	}
+
 	public boolean addPath(HenshinPath path, String identifier) {
-		if (identifier != null && identifier.length()!=0)
+		if (identifier != null && identifier.length() != 0)
 			this.entries.put(identifier, path);
-		else 
+		else
 			return false;
 		return true;
 	}
+
 	@Override
 	public String toString() {
 		return "PH: " + entries;

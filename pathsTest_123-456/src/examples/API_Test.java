@@ -32,7 +32,7 @@ public class API_Test {
 	public static final String staticCreateAccountWRONG = "createAccOOOunt";
 	public static final String staticClientWRONG = "cliEEEEnt";
 	public static final String staticFiveWRONG = "five";
-	public static final String staticNewAccountWrong = "newAccOOOOunt";
+	public static final String staticNewAccountWrong = "newAccOOOOunt"; 
 	
 	// local before global check
 	String localPathDirectory = "files/bAAAAnk";
@@ -71,6 +71,17 @@ public class API_Test {
 		String localFiveWRONG = "five";
 		String localNewAccountWrong = "newAccOOOOunt";
 		
+ 
+		HenshinResourceSet resourceSetDirectPathDirectory = new HenshinResourceSet("files/bank");
+		
+		HenshinResourceSet resourceSetDirectPathParts = new HenshinResourceSet("files/" +"bank");
+		// should have an error marker!
+		HenshinResourceSet resourceSetDirectPathDirectoryWRONG = new HenshinResourceSet("files/bAAAAnk");
+		// should have an error marker!
+		HenshinResourceSet resourceSetDirectPathPartsWRONG1 = new HenshinResourceSet("fiLLLes/"  + "bank");
+		// should have an error marker!
+		HenshinResourceSet resourceSetDirectPathPartsWRONG2 = new HenshinResourceSet("files/"+"bAAAnk");
+		
 
 		HenshinResourceSet resourceSetStaticPathDirectory = new HenshinResourceSet(staticPathDirectory);
 		HenshinResourceSet resourceSetStaticPathParts = new HenshinResourceSet(staticPathPart1+staticPathPart2);
@@ -92,14 +103,6 @@ public class API_Test {
 		HenshinResourceSet resourceSetLocalPathPartsWRONG2 = new HenshinResourceSet(localPathPart1+localPathPart2WRONG);
 		
 		
-		HenshinResourceSet resourceSetDirectPathDirectory = new HenshinResourceSet("files/bank");
-		HenshinResourceSet resourceSetDirectPathParts = new HenshinResourceSet("files/"+"bank");
-		// should have an error marker!
-		HenshinResourceSet resourceSetDirectPathDirectoryWRONG = new HenshinResourceSet("files/bAAAnk");
-		// should have an error marker!
-		HenshinResourceSet resourceSetDirectPathPartsWRONG1 = new HenshinResourceSet("fiLLLes/"+"bank");
-		// should have an error marker!
-		HenshinResourceSet resourceSetDirectPathPartsWRONG2 = new HenshinResourceSet("files/"+"bAAAnk");
 		
 		
 		  

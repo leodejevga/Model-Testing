@@ -16,6 +16,7 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.handlers.HandlerUtil;
 
+
 public class AddRemoveNatureHandler extends AbstractHandler {
 
 	private ISelection selection;
@@ -40,7 +41,8 @@ public class AddRemoveNatureHandler extends AbstractHandler {
 							ObjectInputStream ois = new ObjectInputStream(new FileInputStream("projects.bin"));
 							String projects = "" + (String) ois.readObject();
 							ois.close();
-							projects = enabled?projects.replace(project.getName()+"\n", ""):projects.contains(project.getName())?"":projects + project.getName()+"\n";
+							projects = enabled ? projects.replace(project.getName() + "\n", "")
+									: projects.contains(project.getName()) ? "" : projects + project.getName() + "\n";
 							ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("projects.bin"));
 							oos.writeObject(projects);
 							oos.close();
@@ -63,7 +65,7 @@ public class AddRemoveNatureHandler extends AbstractHandler {
 	private static boolean toggleNature(IProject project) throws CoreException {
 		return toggleNature(project, null);
 	}
-
+	
 	/**
 	 * Toggles sample nature on a project
 	 *
@@ -72,26 +74,25 @@ public class AddRemoveNatureHandler extends AbstractHandler {
 	public static boolean toggleNature(IProject project, Boolean enable) throws CoreException {
 		IProjectDescription description = project.getDescription();
 		String[] natures = description.getNatureIds();
-		String[] newNatures = new String[natures.length];
-		int index = 0;
-		if (enable == null || !enable) {
-			boolean ready = false;
-			for (int i = 0; i < natures.length; ++i) {
-				if (!Nature.NATURE_ID.equals(natures[i])) {
-					// Remove the nature
-					newNatures[index++] = natures[i];
-				}
-				else
-					ready = true;
+
+		for (int i = 0; i < natures.length; ++i) {
+			if (Nature.NATURE_ID.equals(natures[i])) {
+				if(enable!=null && enable)
+					return true;
+				// Remove the nature
+				String[] newNatures = new String[natures.length - 1];
+				System.arraycopy(natures, 0, newNatures, 0, i);
+				System.arraycopy(natures, i + 1, newNatures, i, natures.length - i - 1);
+				description.setNatureIds(newNatures);
+				project.setDescription(description, null);
+				if(enable == null || !enable)
+					return false;
 			}
-			String[] temp = new String[index];
-			System.arraycopy(newNatures, 0, temp, 0, index);
-			description.setNatureIds(temp);
-			project.setDescription(description, null);
-			if(ready)
-				return false;
 		}
-		newNatures = new String[natures.length + 1];
+		if(enable != null && !enable)
+			return false;
+		// Add the nature
+		String[] newNatures = new String[natures.length + 1];
 		System.arraycopy(natures, 0, newNatures, 0, natures.length);
 		newNatures[natures.length] = Nature.NATURE_ID;
 		description.setNatureIds(newNatures);

@@ -37,7 +37,7 @@ public class Builder extends IncrementalProjectBuilder {
 				checkPath(resource);
 				break;
 			}
-			//return true to continue visiting children.
+			// return true to continue visiting children.
 			return true;
 		}
 	}
@@ -45,13 +45,13 @@ public class Builder extends IncrementalProjectBuilder {
 	class SampleResourceVisitor implements IResourceVisitor {
 		public boolean visit(IResource resource) {
 			checkPath(resource);
-			//return true to continue visiting children.
+			// return true to continue visiting children.
 			return true;
 		}
 	}
 
 	class PathErrorHandler extends DefaultHandler {
-		
+
 		private IFile file;
 
 		public PathErrorHandler(IFile file) {
@@ -81,7 +81,7 @@ public class Builder extends IncrementalProjectBuilder {
 
 	private PathParser parser;
 
-	private void addMarker(IFile file, String message, ErrorPosition ep, int severity) {
+	private void addMarker(IFile file, String message, PathException.ErrorPosition ep, int severity) {
 		try {
 			IMarker marker = file.createMarker(MARKER_TYPE);
 			marker.setAttribute(IMarker.MESSAGE, message);
@@ -89,18 +89,17 @@ public class Builder extends IncrementalProjectBuilder {
 			if (ep.line < 0) {
 				ep.line = 1;
 			}
-			
+
 			marker.setAttribute(IMarker.LINE_NUMBER, ep.line);
-			marker.setAttribute(IMarker.CHAR_START, ep.start); 
-			marker.setAttribute(IMarker.CHAR_END,ep.end);
+			marker.setAttribute(IMarker.CHAR_START, ep.start);
+			marker.setAttribute(IMarker.CHAR_END, ep.end);
 		} catch (CoreException e) {
 			System.out.println("Path Error not successfull: " + message);
 		}
 	}
 
 	@Override
-	protected IProject[] build(int kind, Map args, IProgressMonitor monitor)
-			throws CoreException {
+	protected IProject[] build(int kind, Map args, IProgressMonitor monitor) throws CoreException {
 		if (kind == FULL_BUILD) {
 			fullBuild(monitor);
 		} else {
@@ -139,8 +138,7 @@ public class Builder extends IncrementalProjectBuilder {
 		}
 	}
 
-	protected void fullBuild(final IProgressMonitor monitor)
-			throws CoreException {
+	protected void fullBuild(final IProgressMonitor monitor) throws CoreException {
 		try {
 			getProject().accept(new SampleResourceVisitor());
 		} catch (CoreException e) {
@@ -154,8 +152,7 @@ public class Builder extends IncrementalProjectBuilder {
 		return parser;
 	}
 
-	protected void incrementalBuild(IResourceDelta delta,
-			IProgressMonitor monitor) throws CoreException {
+	protected void incrementalBuild(IResourceDelta delta, IProgressMonitor monitor) throws CoreException {
 		// the visitor does the work.
 		delta.accept(new SampleDeltaVisitor());
 	}

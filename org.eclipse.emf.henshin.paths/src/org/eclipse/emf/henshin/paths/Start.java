@@ -35,30 +35,32 @@ public class Start implements IStartup {
 
 	@Override
 	public void earlyStartup() {
-		workspace = ResourcesPlugin.getWorkspace();
-		IProject[] projects = workspace.getRoot().getProjects();
-		String ignoreProjects = "";
-		try {
-			ObjectInputStream ois = new ObjectInputStream(new FileInputStream("projects.bin"));
-			ignoreProjects = (String) ois.readObject();
-			ois.close();
-		} catch (IOException | ClassNotFoundException e1) {
-			System.out.println("Fehler beim Lesen von projects.bin");
-		}
+		if (true) {
+			workspace = ResourcesPlugin.getWorkspace();
+			IProject[] projects = workspace.getRoot().getProjects();
+			String ignoreProjects = "";
+			try {
+				ObjectInputStream ois = new ObjectInputStream(new FileInputStream("projects.bin"));
+				ignoreProjects = (String) ois.readObject();
+				ois.close();
+			} catch (IOException | ClassNotFoundException e1) {
+				System.out.println("Fehler beim Lesen von projects.bin");
+			}
 
-		IResourceChangeListener listener = new ManifestReporter();
-		workspace.addResourceChangeListener(listener, IResourceChangeEvent.POST_CHANGE);
+			IResourceChangeListener listener = new ManifestReporter();
+			workspace.addResourceChangeListener(listener, IResourceChangeEvent.POST_CHANGE);
 
-		for (IProject p : projects) {
-			IFile manifest = (IFile) p.findMember("META-INF/MANIFEST.MF");
-			System.out.println("Project: " + p.getName() + ", File: " + manifest.getName());
+			for (IProject p : projects) {
+				IFile manifest = (IFile) p.findMember("META-INF/MANIFEST.MF");
+				System.out.println("Project: " + p.getName() + ", File: " + manifest.getName());
 
-			if (!ignoreProjects.contains(p.getName())) {
-				try {
-					toggleNature(manifest.getContents(), p);
-				} catch (CoreException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+				if (!ignoreProjects.contains(p.getName())) {
+					try {
+						toggleNature(manifest.getContents(), p);
+					} catch (CoreException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 				}
 			}
 		}
@@ -87,7 +89,7 @@ public class Start implements IStartup {
 
 					if (delta.getAffectedChildren(IResourceDelta.CHANGED).length == 0
 							&& delta.getResource().getProjectRelativePath().toString().equals("META-INF/MANIFEST.MF")) {
-						IFile manifest = (IFile)delta.getResource();
+						IFile manifest = (IFile) delta.getResource();
 						IProject project = manifest.getProject();
 						String ignoreProjects = "";
 						try {
@@ -97,7 +99,7 @@ public class Start implements IStartup {
 						} catch (IOException | ClassNotFoundException e1) {
 							System.out.println("Fehler beim Lesen von projects.bin");
 						}
-						if(ignoreProjects.contains(project.getName()))
+						if (ignoreProjects.contains(project.getName()))
 							return false;
 						toggleNature(manifest.getContents(), project);
 						return false;

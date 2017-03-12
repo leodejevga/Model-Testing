@@ -30,18 +30,19 @@ public class HenshinPath extends Path {
 	public HenshinPath(String path, IProject project) {
 		super(path, project);
 	}
+
 	public HenshinPath(Path path) {
 		super(path.getPath(), path.project);
 	}
-	
+
 	public boolean initResourceSet(boolean force) {
 		if (force || resourceSet == null)
-			try{
-				if(path.getType() != IResource.FOLDER)
+			try {
+				if (path.getType() != IResource.FOLDER)
 					return false;
 				String p = path.getLocation().toOSString();
 				resourceSet = new HenshinResourceSet(p);
-			} catch(Exception e){
+			} catch (Exception e) {
 				return false;
 			}
 
@@ -50,7 +51,7 @@ public class HenshinPath extends Path {
 
 	public boolean initModule(String henshin) {
 		this.henshin = henshin;
-		if(resourceSet != null && henshin.endsWith(".henshin"))
+		if (resourceSet != null && henshin.endsWith(".henshin"))
 			try {
 				module = resourceSet.getModule(henshin, false);
 			} catch (Exception e) {
@@ -63,7 +64,7 @@ public class HenshinPath extends Path {
 
 	public boolean initGraph(String xmi) {
 		this.xmi = xmi;
-		if(resourceSet != null && xmi.endsWith(".xmi"))
+		if (resourceSet != null && xmi.endsWith(".xmi"))
 			try {
 				graph = new EGraphImpl(resourceSet.getResource(xmi));
 			} catch (Exception e) {
@@ -75,14 +76,15 @@ public class HenshinPath extends Path {
 	}
 
 	public boolean initApp() {
-		if (graph != null ) {
+		if (graph != null) {
 			try {
 				engine = new EngineImpl();
 				app = new UnitApplicationImpl(engine);
 				app.setEGraph(graph);
 				initReady = 1;
 				return true;
-			} catch (Exception e) {}
+			} catch (Exception e) {
+			}
 		}
 		initReady = 0;
 		return false;
@@ -101,9 +103,9 @@ public class HenshinPath extends Path {
 		}
 		return false;
 	}
-	
-	public Unit getUnit(String unit){
-		if (module !=null) {
+
+	public Unit getUnit(String unit) {
+		if (module != null) {
 			return module.getUnit(unit);
 		}
 		return null;
@@ -112,17 +114,18 @@ public class HenshinPath extends Path {
 	public boolean isParameter(String parameter, Object value) {
 		return isParameter(parameter, value, null, null);
 	}
+
 	public boolean isParameter(String parameter, Object value, String type, ParameterKind kind) {
 		if (initReady > 1) {
 			try {
 				Parameter p = app.getUnit().getParameter(parameter);
-				if(p==null)
+				if (p == null)
 					return false;
 				ParameterKind pk = p.getKind();
-				if(kind!=null && pk != kind)
+				if (kind != null && pk != kind)
 					return false;
 				String ec = p.getType().getName();
-				if(type!=null && !ec.equals(type))
+				if (type != null && !ec.equals(type))
 					return false;
 				app.setParameterValue(parameter, value);
 				return true;
@@ -131,14 +134,15 @@ public class HenshinPath extends Path {
 		}
 		return false;
 	}
+
 	public boolean isOutParameter(String parameter) {
 		if (initReady > 1) {
 			try {
 				Parameter p = app.getUnit().getParameter(parameter);
-				if(p==null)
+				if (p == null)
 					return false;
 				ParameterKind pk = p.getKind();
-				if(pk == ParameterKind.INOUT || pk == ParameterKind.OUT )
+				if (pk == ParameterKind.INOUT || pk == ParameterKind.OUT)
 					return true;
 			} catch (Exception e) {
 			}
@@ -146,42 +150,49 @@ public class HenshinPath extends Path {
 		return false;
 	}
 
-	public boolean resource(){
-		return resourceSet!=null;
+	public boolean resource() {
+		return resourceSet != null;
 	}
-	public boolean app(){
-		return app!=null;
+
+	public boolean app() {
+		return app != null;
 	}
-	public boolean graph(){
-		return graph!=null;
+
+	public boolean graph() {
+		return graph != null;
 	}
-	public boolean module(){
-		return module!=null;
+
+	public boolean module() {
+		return module != null;
 	}
+
 	public boolean engine() {
-		return engine!=null;
+		return engine != null;
 	}
-	public boolean rule(){
+
+	public boolean rule() {
 		return initReady > 1;
 	}
+
 	@Override
 	protected HenshinPath clone() {
 		HenshinPath result = new HenshinPath(getPath(), project);
-		if(resource()) 
+		if (resource())
 			result.initResourceSet(true);
-		if(module())
+		if (module())
 			result.initModule(henshin);
-		if(graph())
+		if (graph())
 			result.initGraph(xmi);
-		if(app())
+		if (app())
 			result.initApp();
-		if(rule())
+		if (rule())
 			result.initRule(rule);
 		return result;
 	}
-	
+
 	@Override
 	public String toString() {
-		return super.toString() + (resource()?":rSet":"") + (module()?":module":"") + (graph()?":graph":"") + (engine()?":engine":"") + (app()?":app":"") + "\n";
+		return super.toString() + (resource() ? ":rSet" : "") + (module() ? ":module" : "") + (graph() ? ":graph" : "")
+				+ (engine() ? ":engine" : "") + (app() ? ":app" : "") + "\n";
 	}
 }

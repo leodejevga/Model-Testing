@@ -17,7 +17,7 @@ import org.eclipse.core.resources.IResource;
 
 public class PathParser {
 
-	private ErrorPosition position;
+	private PathException.ErrorPosition position;
 	private List<String> fullPath = new ArrayList<String>();
 	private IFile file;
 	private PathErrorHandler reporter;
@@ -36,23 +36,23 @@ public class PathParser {
 		int b = contents.read();
 		boolean ignoreComment = false;
 		boolean ignoreDoc = false;
-		position = new ErrorPosition();
+		position = new PathException.ErrorPosition();
 		position.line = 1;
 		position.end = 1;
-		
+
 		marker = this.file.createMarker("Path Error");
-		
+
 		while (b != -1) {
 			if ((char) b == ';' || (char) b == '{' || (char) b == '}') {
 				findPath(row);
 				row = "";
-			} else if ((char) b == '\n') {
+			} else if ((char) b == '\n' || (char) b == '\r') {
 				if (ignoreComment) {
 					ignoreComment = false;
 					row = "";
 				}
 				position.line++;
-			} else if ((char) b == '/' && prevb == '/' || (char)b == '@')
+			} else if ((char) b == '/' && prevb == '/' || (char) b == '@')
 				ignoreComment = true;
 			else if (((char) b == '*' && (char) prevb == '/') || ((char) prevb == '*' && (char) b == '/')) {
 				if (!ignoreDoc && row.length() != 0)
@@ -72,47 +72,51 @@ public class PathParser {
 		String path = getMatchedStrings(row, "(\"[A-Za-z0-9\\-\\_/\\.]+\"|\\((\\w|\\w+ *, *\\w+)*\\))")
 				.replaceAll("[\\(\\)]+", "");
 		String identifier = getMatchedStrings(row, "([A-Za-z]+)(.*[\\(=])+", "f *=", "l +", "f\\.", "f\\(");
-		
 		if (!path.equals("") && !identifier.equals("")) {
 			boolean henshinPath = checkHenshin(row);
-			if (!row.contains(" final ") && !henshinPath && path.contains("\"")){ // && (path.contains("/") || path.contains("."))){
+			if (!henshinPath && path.contains("\"")) { // && (path.contains("/") ||
+																					// path.contains("."))){
 				HenshinPath p = new HenshinPath(path.replaceAll("\"", ""), file.getProject());
 				paths.addPath(p, identifier);
-				if(!p.exists() && !p.isFile()){
+				if (!p.exists() && !p.isFile()) {
 					position.set(row, path);
 					raiseError(true, "Path not Found");
 					position.reset();
 				}
-			}
-			else if(!henshinPath)
+			} else if (!henshinPath)
 				paths.addPath(path, identifier);
 		}
 	}
 
 	private boolean checkHenshin(String row) {
-		
+
 		boolean result = checkResource(row);
-		result = result?true:checkModule(row);
-		result = result?true:getResource(row);
-		result = result?true:setGraph(row);
-		result = result?true:setUnit(row);
-		result = result?true:setParameter(row);
-		result = result?true:resultParameter(row);
+		result = result ? true : checkModule(row);
+		result = result ? true : getResource(row);
+		result = result ? true : setGraph(row);
+		result = result ? true : setUnit(row);
+		result = result ? true : setParameter(row);
+		result = result ? true : resultParameter(row);
 		return result;
 	}
 
 	private boolean resultParameter(String row) {
-		String content = getMatchedStrings(row, "\\.getResultParameterValue\\(\"\\w+\"", "l\\.getResultParameterValue\\(\"").replace("\"", "");
-		content = content.length()==0? ":" + getMatchedStrings(row, "\\.getResultParameterValue\\(\\w+", "l\\.getResultParameterValue\\("):content;
-		if(content.length()!=0 && !content.equals(":")){
-			String identifier = getMatchedStrings(row, "\\w+\\.getResultParameterValue\\(", "f\\.getResultParameterValue\\(");
+		String content = getMatchedStrings(row, "\\.getResultParameterValue\\(\"\\w+\"",
+				"l\\.getResultParameterValue\\(");
+		content = content.length() == 0
+				? ":" + getMatchedStrings(row, "\\.getResultParameterValue\\(\\w+", "l\\.getResultParameterValue\\(")
+				: content;
+		if (content.length() != 0 && !content.equals(":")) {
+			String identifier = getMatchedStrings(row, "\\w+\\.getResultParameterValue\\(",
+					"f\\.getResultParameterValue\\(");
 
-			String linkedContent = content.startsWith(":")?paths.getPathAsString(content.substring(1)):content;
-			content = content.startsWith(":")?content.substring(1):content;
-			
+			String contentPath = content.replace("+", "").replace(" ", "").replace("\"", "");
+			String linkedContent = content.startsWith(":") ? paths.getPathAsString(content.substring(1)) : contentPath;
+			content = content.startsWith(":") ? content.substring(1) : content;
+
 			HenshinPath app = paths.getPath(identifier);
 			HenshinPath temp = app.clone();
-			if(temp.rule()){
+			if (temp.rule()) {
 				position.set(row, content);
 				raiseError(!temp.isOutParameter(linkedContent), "\"" + linkedContent + "\" is not a result parameter");
 				position.reset();
@@ -125,31 +129,33 @@ public class PathParser {
 	}
 
 	private boolean setParameter(String row) {
-		String content = getMatchedStrings(row, "\\.setParameterValue\\(\"\\w+\"", "l\\.setParameterValue\\(\"").replace("\"", "");
-		content = content.length()==0? ":" + getMatchedStrings(row, "\\.setParameterValue\\(\\w+", "l\\.setParameterValue\\("):content;
-		if(content.length()!=0 && !content.equals(":")){
+		String content = getMatchedStrings(row, "\\.setParameterValue\\(\"\\w+\"", "l\\.setParameterValue\\(");
+		content = content.length() == 0
+				? ":" + getMatchedStrings(row, "\\.setParameterValue\\(\\w+", "l\\.setParameterValue\\(") : content;
+		if (content.length() != 0 && !content.equals(":")) {
 			String identifier = getMatchedStrings(row, "\\w+\\.setParameterValue\\(", "f\\.setParameterValue\\(");
 			String value = getMatchedStrings(row, "\\.setParameterValue\\(.+\\)", "l\\.setParameterValue\\(.+, ");
-			value = value.substring(0, value.length()-1);
-			String type=null;
-			if(value.contains("\""))
+			value = value.substring(0, value.length() - 1);
+			String type = null;
+			if (value.contains("\""))
 				type = "EString";
-			else if(value.contains("d"))
+			else if (value.contains("d"))
 				type = "EDouble";
-			else if(value.split("[a-zA-Z]").length==1)
+			else if (value.split("[a-zA-Z]").length == 1)
 				type = "EInt";
-			
-			String linkedContent = content.startsWith(":")?paths.getPathAsString(content.substring(1)):content;
-			content = content.startsWith(":")?content.substring(1):content;
-			
+
+			String contentPath = content.replace("+", "").replace(" ", "").replace("\"", "");
+			String linkedContent = content.startsWith(":") ? paths.getPathAsString(content.substring(1)) : contentPath;
+			content = content.startsWith(":") ? content.substring(1) : content;
+
 			HenshinPath app = paths.getPath(identifier);
-			if(linkedContent == null)
+			if (linkedContent == null)
 				return true;
-			if(app.rule()){
+			if (app.rule()) {
 				position.set(row, content);
-				raiseError(!app.isParameter(linkedContent, value, type, null), "Parameter \"" + linkedContent + "\" is not a parameter of " + identifier);
-			}
-			else if(app.exists() && app.module()){
+				raiseError(!app.isParameter(linkedContent, value, type, null),
+						"Parameter \"" + linkedContent + "\" is not a parameter of " + identifier);
+			} else if (app.exists() && app.module()) {
 				position.set(row, identifier);
 				raiseError(true, "A rule for " + identifier + " is not set yet");
 			}
@@ -162,29 +168,34 @@ public class PathParser {
 	}
 
 	private boolean setUnit(String row) {
-		String content = getMatchedStrings(row, "\\.setUnit\\(\\w+\\.getUnit\\(\"\\w+\"", "l\\.setUnit\\(\\w+\\.getUnit\\(\"").replace("\"", "");
-		content = content.length()==0? ":" + getMatchedStrings(row, "\\.setUnit\\(\\w+\\.getUnit\\(\\w+", "l\\.setUnit\\(\\w+\\.getUnit\\("):content;
-		if(content.length()!=0 && !content.equals(":")){
+		String content = getMatchedStrings(row, "\\.setUnit\\(\\w+\\.getUnit\\(\"\\w+\"",
+				"l\\.setUnit\\(\\w+\\.getUnit\\(");
+		content = content.length() == 0
+				? ":" + getMatchedStrings(row, "\\.setUnit\\(\\w+\\.getUnit\\(\\w+", "l\\.setUnit\\(\\w+\\.getUnit\\(")
+				: content;
+		if (content.length() != 0 && !content.equals(":")) {
 			String identifier = getMatchedStrings(row, "\\w+\\.setUnit\\(", "f\\.setUnit\\(");
 
-			String linkedContent = content.startsWith(":")?paths.getPathAsString(content.substring(1)):content;
-			content = content.startsWith(":")?content.substring(1):content;
-			
+			String contentPath = content.replace("+", "").replace(" ", "").replace("\"", "");
+			String linkedContent = content.startsWith(":") ? paths.getPathAsString(content.substring(1)) : contentPath;
+			content = content.startsWith(":") ? content.substring(1) : content;
+
 			HenshinPath app = paths.getPath(identifier);
 			HenshinPath module = paths.getPath(getMatchedStrings(row, "\\w+\\.getUnit", "f\\.getUnit"));
 			Unit unit = module.getUnit(linkedContent);
-			if(module.module() && unit == null){
+			if (module.module() && unit == null) {
 				position.set(row, content);
 				raiseError(true, "The Module dont has Unit " + linkedContent);
 				position.reset();
 				return true;
 			}
 			position.set(row, identifier);
-			raiseError(app==null, identifier + " is not initialized");
+			raiseError(app == null, identifier + " is not initialized");
 			position.reset();
-			if(app.app() && unit!=null){
+			if (app.app() && unit != null) {
 				position.set(row, content);
-				raiseError(!app.initRule(unit), "The initialization of Rule " + unit.getName() + " was not successfull");
+				raiseError(!app.initRule(unit),
+						"The initialization of Rule " + unit.getName() + " was not successfull");
 				position.reset();
 			}
 			paths.addPath(app, identifier);
@@ -196,11 +207,11 @@ public class PathParser {
 
 	private boolean setGraph(String row) {
 		String content = getMatchedStrings(row, "\\.setEGraph\\(\\w+", "l\\.setEGraph\\(");
-		if(content.length()!=0){
+		if (content.length() != 0) {
 			String identifier = getMatchedStrings(row, "\\w+\\.setEGraph\\(", "f\\.setEGraph\\(");
 			HenshinPath app = paths.getPath(content);
 			HenshinPath temp = app.clone();
-			if(temp.graph()){
+			if (temp.graph()) {
 				position.set(row, content);
 				raiseError(!temp.initApp(), "Init app dont worked");
 				position.reset();
@@ -213,18 +224,20 @@ public class PathParser {
 	}
 
 	private boolean getResource(String row) {
-		String content = getMatchedStrings(row, "\\.getResource\\(\".+\"", "l\\.getResource\\(\"").replace("\"", "");
-		content = content.length()==0?":" + getMatchedStrings(row, "\\.getResource\\(\\w+", "l\\.getResource\\("):content;
-		if(content.length()!=0 && !content.equals(":")){
+		String content = getMatchedStrings(row, "\\.getResource\\(\".+\"", "l\\.getResource\\(");
+		content = content.length() == 0 ? ":" + getMatchedStrings(row, "\\.getResource\\(\\w+", "l\\.getResource\\(")
+				: content;
+		if (content.length() != 0 && !content.equals(":")) {
 			String identifier = getMatchedStrings(row, "EGraph \\w+", "lEGraph ");
 			String resource = getMatchedStrings(row, "\\w+\\.getResource\\(", "f\\.getResource\\(");
 			HenshinPath resourceHP = paths.getPath(resource);
 
-			String linkedContent = content.startsWith(":")?paths.getPathAsString(content.substring(1)):content;
-			content = content.startsWith(":")?content.substring(1):content;
+			String contentPath = content.replace("+", "").replace(" ", "").replace("\"", "");
+			String linkedContent = content.startsWith(":") ? paths.getPathAsString(content.substring(1)) : contentPath;
+			content = content.startsWith(":") ? content.substring(1) : content;
 
 			HenshinPath temp = resourceHP.clone();
-			if(temp.exists() && temp.resource()){
+			if (temp.exists() && temp.resource()) {
 				position.set(row, content);
 				raiseError(!temp.initGraph(linkedContent), "Init Graph dont worked");
 				position.reset();
@@ -237,20 +250,23 @@ public class PathParser {
 	}
 
 	private boolean checkModule(String row) {
-		String content="";
-		content = getMatchedStrings(row, "getModule\\(\".+\"", "lgetModule\\(\"").replace("\"", "");
-		content = content.length()==0?":" + getMatchedStrings(row, "getModule\\(\\w+", "lgetModule\\("):content;
-		if(content.length()!=0 && !content.equals(":")){
-			
+		String content = "";
+		content = getMatchedStrings(row, "getModule\\(\".+\"", "lgetModule\\(");
+		content = content.length() == 0 ? ":" + getMatchedStrings(row, "getModule\\(\\w+", "lgetModule\\(") : content;
+		if (content.length() != 0 && !content.equals(":")) {
+
 			String identifier = getMatchedStrings(row, "Module \\w+", "lModule ");
-			if(identifier.length()==0)
+			if (identifier.length() == 0)
 				return false;
 			HenshinPath resource = paths.getPath(getMatchedStrings(row, "\\w+.getModule\\(", "f.getModule\\("));
-			
-			String linkedContent = content.startsWith(":")?paths.getPathAsString(content.substring(1)):content;
-			content = content.startsWith(":")?content.substring(1):content;
+
+			String contentPath = content.replace("+", "").replace(" ", "").replace("\"", "");
+			String linkedContent = content.startsWith(":") ? paths.getPathAsString(content.substring(1)) : contentPath;
+			content = content.startsWith(":") ? content.substring(1) : content;
+			if(resource == null)
+				return false;
 			HenshinPath temp = resource.clone();
-			if(temp.exists() && temp.resource()){
+			if (temp.exists() && temp.resource()) {
 				position.set(row, content);
 				raiseError(!temp.initModule(linkedContent), "Init Module dont worked");
 				position.reset();
@@ -263,41 +279,41 @@ public class PathParser {
 	}
 
 	private boolean checkResource(String row) {
-		String content = getMatchedStrings(row, "HenshinResourceSet\\(\".+\"", "lHenshinResourceSet\\(\"").replace("\"", "");
-		content = content.length()==0?":" + getMatchedStrings(row, "HenshinResourceSet\\(\\w+", "lHenshinResourceSet\\("):content;
-		if(content.length()!=0 && !content.equals(":")){
+		String content = getMatchedStrings(row, "HenshinResourceSet\\(\".+\"", "lHenshinResourceSet\\(");
+		content = content.length() == 0
+				? ":" + getMatchedStrings(row, "HenshinResourceSet\\(\\w+", "lHenshinResourceSet\\(") : content;
+		if (content.length() != 0 && !content.equals(":")) {
 			String identifier = getMatchedStrings(row, "HenshinResourceSet \\w+", "lHenshinResourceSet ");
-
-			String linkedContent = content.startsWith(":")?paths.getPathAsString(content.substring(1)):content;
 			
+			String contentPath = content.replace("+", "").replace(" ", "").replace("\"", "");
+			String linkedContent = content.startsWith(":") ? paths.getPathAsString(content.substring(1)) : contentPath;
+
 			HenshinPath p;
-			if(content.startsWith(":")){
+			if (content.startsWith(":")) {
 				content = content.substring(1);
 				p = paths.getPath(content);
+			} else {
+				p = new HenshinPath(contentPath, file.getProject());
 			}
-			else{
-				p = new HenshinPath(content, file.getProject());
-			}
-			if(p==null){
+			if (p == null) {
 				return false;
 			}
-			if(!p.exists() && linkedContent.length()==0){
+			if (!p.exists() && linkedContent.length() == 0) {
 				raiseError(true, "Path not found");
 				return true;
 			}
 			HenshinPath n = p.clone();
 
 			position.set(row, content);
-			raiseError(!n.initResourceSet(true), "Resourceset Not initialized");
+			raiseError(!n.initResourceSet(true), "Resourceset not initialized");
 			position.reset();
-			
+
 			paths.addPath(n, identifier);
 			return true;
 		}
 		return false;
 	}
 
-	
 	private String getPath(String path) {
 		String result = "";
 		String[] identifiers = path.split(" *, *");
@@ -318,10 +334,10 @@ public class PathParser {
 			String r = m.group();
 			if (split != null)
 				for (String s : split) {
-					try{
+					try {
 						String[] temp = r.split(s.substring(1));
-						r = temp.length==0?"":temp[s.charAt(0) == 'f' ? 0 : temp.length - 1];
-					} catch(Exception e){
+						r = temp.length == 0 ? "" : temp[s.charAt(0) == 'f' ? 0 : temp.length - 1];
+					} catch (Exception e) {
 						e.printStackTrace();
 					}
 				}
@@ -331,12 +347,13 @@ public class PathParser {
 	}
 
 	private boolean raiseError(boolean error, String row) {
-		if (error){
+		if (error) {
 			reporter.error(new PathException(row, position));
-//			marker.
+			// marker.
 		}
 		return error;
 	}
+
 	private boolean raiseWarning(boolean warning, String row) {
 		if (warning)
 			reporter.warning(new PathException(row, position));
