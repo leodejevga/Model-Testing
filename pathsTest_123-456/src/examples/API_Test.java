@@ -26,7 +26,11 @@ public class API_Test {
 	public static final String staticPathPart1WRONG = "fiLLLes/";
 	public static final String staticPathPart2WRONG = "bAAAnk";
 	public static final String staticNameModuleWRONG1 = "bAAAnk.henshin";
+	public static final String staticNameModulePart1WRONG1 = "bAAAnk";
+	public static final String staticNameModulePart2WRONG1 = ".henshin";
 	public static final String staticNameModuleWRONG2 = "bank.hEEEnshin";
+	public static final String staticNameModulePart1WRONG2 = "bank";
+	public static final String staticNameModulePart2WRONG2 = ".hEEEnshin";
 	public static final String staticNameInstanceWRONG1 = "exAAAAmple-bank.xmi";
 	public static final String staticNameInstanceWRONG2 = "example-bank.xMMMi";
 	public static final String staticCreateAccountWRONG = "createAccOOOunt";
@@ -63,7 +67,11 @@ public class API_Test {
 		String localPathPart1WRONG = "fiLLLes/";
 		String localPathPart2WRONG = "bAAAnk";
 		String localNameModuleWRONG1 = "bAAAnk.henshin";
+		String localNameModulePart1WRONG1 = "bAAAnk";
+		String localNameModulePart2WRONG1 = ".henshin";
 		String localNameModuleWRONG2 = "bank.hEEEnshin";
+		String localNameModulePart1WRONG2 = "bank";
+		String localNameModulePart2WRONG2 = ".hEEEnshin";
 		String localNameInstanceWRONG1 = "exAAAAmple-bank.xmi";
 		String localNameInstanceWRONG2 = "example-bank.xMMMi";
 		String localCreateAccountWRONG = "createAccOOOunt";
@@ -113,33 +121,34 @@ public class API_Test {
 		// should have an error marker!
 		Module moduleStaticPathDirectoryWRONG1 = resourceSetStaticPathDirectory.getModule(staticNameModuleWRONG1, false);
 		// should have an error marker!
-		Module moduleStaticPathPartsWRONG1 = resourceSetStaticPathParts.getModule(staticNameModuleWRONG1, false);
+		Module moduleStaticPathPartsWRONG1 = resourceSetStaticPathParts.getModule(staticNameModulePart1WRONG1 + staticNameModulePart2WRONG1, false);
 		// should have an error marker!
 		Module moduleStaticPathDirectoryWRONG2 = resourceSetStaticPathDirectory.getModule(staticNameModuleWRONG2, false);
 		// should have an error marker!
-		Module moduleStaticPathPartsWRONG2 = resourceSetStaticPathParts.getModule(staticNameModuleWRONG2, false);
+		Module moduleStaticPathPartsWRONG2 = resourceSetStaticPathParts.getModule(staticNameModulePart1WRONG2 + staticNameModulePart2WRONG2, false);
 
 		Module moduleLocalPathDirectory = resourceSetLocalPathDirectory.getModule(localNameModule, false);
 		Module moduleLocalPathParts = resourceSetLocalPathParts.getModule(localNameModule, false);
 		// should have an error marker!
 		Module moduleLocalPathDirectoryWRONG1 = resourceSetLocalPathDirectory.getModule(localNameModuleWRONG1, false);
 		// should have an error marker!
-		Module moduleLocalPathPartsWRONG1 = resourceSetLocalPathParts.getModule(localNameModuleWRONG1, false);
+		Module moduleLocalPathPartsWRONG1 = resourceSetLocalPathParts.getModule(localNameModulePart1WRONG1 + localNameModulePart2WRONG1, false);
 		// should have an error marker!
 		Module moduleLocalPathDirectoryWRONG2 = resourceSetLocalPathDirectory.getModule(localNameModuleWRONG2, false);
 		// should have an error marker!
-		Module moduleLocalPathPartsWRONG2 = resourceSetLocalPathParts.getModule(localNameModuleWRONG2, false);
+		Module moduleLocalPathPartsWRONG2 = resourceSetLocalPathParts.getModule(localNameModulePart1WRONG2 + localNameModulePart2WRONG2, false);
 		
 		Module moduleDirectPathDirectory = resourceSetDirectPathDirectory.getModule("bank.henshin", false);
 		Module moduleDirectPathParts = resourceSetDirectPathParts.getModule("bank.henshin", false);
+		Module moduleDirectPathParts2 = resourceSetDirectPathParts.getModule("bank"+".henshin", false);
 		// should have an error marker!
 		Module moduleDirectPathDirectoryWRONG1 = resourceSetDirectPathDirectory.getModule("bAAAnk.henshin", false);
 		// should have an error marker!
-		Module moduleDirectPathPartsWRONG1 = resourceSetDirectPathParts.getModule("bAAAnk.henshin", false);
+		Module moduleDirectPathPartsWRONG1 = resourceSetDirectPathParts.getModule("bAAAnk" + ".henshin", false);
 		// should have an error marker!
 		Module moduleDirectPathDirectoryWRONG2 = resourceSetDirectPathDirectory.getModule("bank.hEEEnshin", false);
 		// should have an error marker!
-		Module moduleDirectPathPartsWRONG2 = resourceSetDirectPathParts.getModule("bank.hEEEnshin", false);
+		Module moduleDirectPathPartsWRONG2 = resourceSetDirectPathParts.getModule("bank" + ".hEEEnshin", false);
 		
 
 		// Load the example model into an EGraph:
