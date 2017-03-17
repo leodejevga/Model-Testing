@@ -49,7 +49,7 @@ public class BankExample {
 		Module m2 = r1.getModule(re, false);
 
 		// Load the example model into an EGraph:
-		String s1= "example-banks.xmi";
+		String s1= "example-banks.xmi"; 
 		EGraph g2 = new EGraphImpl(r1.getResource(s1)); 
 		EGraph g1 = new EGraphImpl(r1.getResource("example-bank.xmi")); 
 		

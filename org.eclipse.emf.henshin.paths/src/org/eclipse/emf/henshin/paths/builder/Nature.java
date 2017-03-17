@@ -7,15 +7,21 @@ import org.eclipse.core.resources.IProjectNature;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class Nature.
+ */
 public class Nature implements IProjectNature {
 
-	/**
-	 * ID of this project nature
-	 */
+	/** ID of the nature. */
 	public static final String NATURE_ID = "org.eclipse.emf.henshin.paths.Nature";
 
+	/** The project. */
 	private IProject project;
 
+	/**
+	 * @see org.eclipse.core.resources.IProjectNature#configure()
+	 */
 	@Override
 	public void configure() throws CoreException {
 		IProjectDescription desc = project.getDescription();
@@ -36,6 +42,9 @@ public class Nature implements IProjectNature {
 		project.setDescription(desc, null);
 	}
 
+	/**
+	 * @see org.eclipse.core.resources.IProjectNature#deconfigure()
+	 */
 	@Override
 	public void deconfigure() throws CoreException {
 		IProjectDescription description = project.getDescription();
@@ -53,11 +62,17 @@ public class Nature implements IProjectNature {
 		}
 	}
 
+	/**
+	 * @see org.eclipse.core.resources.IProjectNature#getProject()
+	 */
 	@Override
 	public IProject getProject() {
 		return project;
 	}
 
+	/**
+	 * @see org.eclipse.core.resources.IProjectNature#setProject(org.eclipse.core.resources.IProject)
+	 */
 	@Override
 	public void setProject(IProject project) {
 		this.project = project;

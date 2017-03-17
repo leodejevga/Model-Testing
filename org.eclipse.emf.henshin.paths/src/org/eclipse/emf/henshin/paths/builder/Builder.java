@@ -18,9 +18,21 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
+/**
+ * The Class Builder.<br>
+ * Perform searching for path errors.
+ */
 public class Builder extends IncrementalProjectBuilder {
 
+	/**
+	 * The Class SampleDeltaVisitor. <br>
+	 * Handles resource change kinds.
+	 */
 	class SampleDeltaVisitor implements IResourceDeltaVisitor {
+		
+		/**
+		 * @see org.eclipse.core.resources.IResourceDeltaVisitor#visit(org.eclipse.core.resources.IResourceDelta)
+		 */
 		@Override
 		public boolean visit(IResourceDelta delta) throws CoreException {
 			IResource resource = delta.getResource();
@@ -29,20 +41,23 @@ public class Builder extends IncrementalProjectBuilder {
 				// handle added resource
 				checkPath(resource);
 				break;
-			case IResourceDelta.REMOVED:
-				// handle removed resource
-				break;
 			case IResourceDelta.CHANGED:
 				// handle changed resource
 				checkPath(resource);
 				break;
 			}
-			// return true to continue visiting children.
 			return true;
 		}
 	}
 
+	/**
+	 * The Class SampleResourceVisitor.
+	 */
 	class SampleResourceVisitor implements IResourceVisitor {
+		
+		/* (non-Javadoc)
+		 * @see org.eclipse.core.resources.IResourceVisitor#visit(org.eclipse.core.resources.IResource)
+		 */
 		public boolean visit(IResource resource) {
 			checkPath(resource);
 			// return true to continue visiting children.
@@ -50,37 +65,87 @@ public class Builder extends IncrementalProjectBuilder {
 		}
 	}
 
+	/**
+	 * The Class PathErrorHandler.
+	 */
 	class PathErrorHandler extends DefaultHandler {
 
+		/** The file that was changed and has to be handled. */
 		private IFile file;
 
+		/**
+		 * Instantiates a new path error handler.
+		 *
+		 * @param file the file
+		 */
 		public PathErrorHandler(IFile file) {
 			this.file = file;
 		}
 
+		/**
+		 * Adds the marker with PathException.
+		 *
+		 * @param e the PathException, that has to be thrown
+		 * @param message the error message to display
+		 * @param severity the severity (Error, Warning, Info)
+		 */
 		private void addMarker(PathException e, String message, int severity) {
 			Builder.this.addMarker(file, message + e.getMessage(), e.getPosition(), severity);
 		}
 
+		/**
+		 * Throws an Error.
+		 *
+		 * @param exception the PathException
+		 */
 		public void error(PathException exception) {
 			addMarker(exception, "Path Error: ", IMarker.SEVERITY_ERROR);
 		}
 
+		/**
+		 * Throws a Fatal error.
+		 *
+		 * @param exception the PathException
+		 */
 		public void fatalError(PathException exception) {
 			addMarker(exception, "Path Fatal Error: ", IMarker.SEVERITY_ERROR);
 		}
 
+		/**
+		 * Throws a Warning.
+		 *
+		 * @param exception the PathException
+		 */
 		public void warning(PathException exception) {
 			addMarker(exception, "Path Warning: ", IMarker.SEVERITY_WARNING);
 		}
+		/**
+		 * Throws an Info.
+		 *
+		 * @param exception the PathException
+		 */
+		public void info(PathException exception) {
+			addMarker(exception, "Path Warning: ", IMarker.SEVERITY_INFO);
+		}
 	}
 
+	/** The Constant BUILDER_ID. */
 	public static final String BUILDER_ID = "org.eclipse.emf.henshin.paths.Builder";
 
+	/** The Constant MARKER_TYPE. */
 	public static final String MARKER_TYPE = "org.eclipse.emf.henshin.paths.pathProblem";
 
+	/** The parser. */
 	private PathParser parser;
 
+	/**
+	 * Adds the marker of given severity with a message at position by a specific File.
+	 *
+	 * @param file the file
+	 * @param message the error message
+	 * @param ep the Position of the marker and underlining coordinates
+	 * @param severity the severity
+	 */
 	private void addMarker(IFile file, String message, PathException.ErrorPosition ep, int severity) {
 		try {
 			IMarker marker = file.createMarker(MARKER_TYPE);
@@ -98,6 +163,9 @@ public class Builder extends IncrementalProjectBuilder {
 		}
 	}
 
+	/**
+	 * @see org.eclipse.core.resources.IncrementalProjectBuilder#build(int, java.util.Map, org.eclipse.core.runtime.IProgressMonitor)
+	 */
 	@Override
 	protected IProject[] build(int kind, Map args, IProgressMonitor monitor) throws CoreException {
 		if (kind == FULL_BUILD) {
@@ -113,12 +181,20 @@ public class Builder extends IncrementalProjectBuilder {
 		return null;
 	}
 
+	/**
+	 * @see org.eclipse.core.resources.IncrementalProjectBuilder#clean(org.eclipse.core.runtime.IProgressMonitor)
+	 */
 	protected void clean(IProgressMonitor monitor) throws CoreException {
 		// delete markers set and files created
 		getProject().deleteMarkers(MARKER_TYPE, true, IResource.DEPTH_INFINITE);
 	}
 
-	void checkPath(IResource resource) {
+	/**
+	 * Checks java files for paths that are failure.
+	 *
+	 * @param resource the resource
+	 */
+	private void checkPath(IResource resource) {
 		if (resource instanceof IFile && resource.getName().endsWith(".java")) {
 			IFile file = (IFile) resource;
 			deleteMarkers(file);
@@ -131,6 +207,11 @@ public class Builder extends IncrementalProjectBuilder {
 		}
 	}
 
+	/**
+	 * Delete markers.
+	 *
+	 * @param file the file
+	 */
 	private void deleteMarkers(IFile file) {
 		try {
 			file.deleteMarkers(MARKER_TYPE, false, IResource.DEPTH_ZERO);
@@ -138,6 +219,12 @@ public class Builder extends IncrementalProjectBuilder {
 		}
 	}
 
+	/**
+	 * Full build.
+	 *
+	 * @param monitor the monitor
+	 * @throws CoreException the core exception
+	 */
 	protected void fullBuild(final IProgressMonitor monitor) throws CoreException {
 		try {
 			getProject().accept(new SampleResourceVisitor());
@@ -145,6 +232,12 @@ public class Builder extends IncrementalProjectBuilder {
 		}
 	}
 
+	/**
+	 * Gets the parser.
+	 *
+	 * @return the parser
+	 * @throws ParserConfigurationException the parser configuration exception
+	 */
 	private PathParser getParser() throws ParserConfigurationException {
 		if (parser == null) {
 			parser = new PathParser();
@@ -152,6 +245,13 @@ public class Builder extends IncrementalProjectBuilder {
 		return parser;
 	}
 
+	/**
+	 * Incremental build.
+	 *
+	 * @param delta the delta
+	 * @param monitor the monitor
+	 * @throws CoreException the core exception
+	 */
 	protected void incrementalBuild(IResourceDelta delta, IProgressMonitor monitor) throws CoreException {
 		// the visitor does the work.
 		delta.accept(new SampleDeltaVisitor());

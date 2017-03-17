@@ -29,10 +29,18 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.DateTime;
 import org.eclipse.ui.IStartup;
 
+/**
+ * This class will start while eclipse opening. <br>
+ * It looks for projects, where path builder should be activated.
+ */
 public class Start implements IStartup {
-	private boolean configured = false;
-	IWorkspace workspace = null;
 
+	/** The workspace. */
+	private IWorkspace workspace = null;
+
+	/**
+	 * @see org.eclipse.ui.IStartup#earlyStartup()
+	 */
 	@Override
 	public void earlyStartup() {
 		if (true) {
@@ -66,8 +74,18 @@ public class Start implements IStartup {
 		}
 	}
 
+	/**
+	 * The Class ManifestReporter. Listen to changing of resources. <br>
+	 * This reporter listen just for MANIFEST.MF files.
+	 */
 	private class ManifestReporter implements IResourceChangeListener {
 
+		/**
+		 * Listen to Post Change events.
+		 * 
+		 * @see org.eclipse.core.resources.IResourceChangeListener#resourceChanged(org.eclipse.core.resources.
+		 * IResourceChangeEvent)
+		 */
 		@Override
 		public void resourceChanged(IResourceChangeEvent event) {
 			if (event.getType() == IResourceChangeEvent.POST_CHANGE) {
@@ -80,8 +98,15 @@ public class Start implements IStartup {
 			}
 		}
 
+		/**
+		 * The Class ManifestVisitor. Visits the MANIFEST.MF files to recognize if they are containing henshin interpreter. <br>
+		 * If true, the Path Builder will be activated for this project.
+		 */
 		private class ManifestVisitor implements IResourceDeltaVisitor {
 
+			/**
+			 * @see org.eclipse.core.resources.IResourceDeltaVisitor#visit(org.eclipse.core.resources.IResourceDelta)
+			 */
 			@Override
 			public boolean visit(IResourceDelta delta) throws CoreException {
 
@@ -108,27 +133,20 @@ public class Start implements IStartup {
 				}
 				return false;
 			}
-
-			private IResourceDelta findManifest(IResourceDelta[] children) {
-				for (IResourceDelta c : children) {
-					IResourceDelta[] newChildren = c.getAffectedChildren(IResourceDelta.CHANGED);
-					if (newChildren.length == 0) {
-						if (c.getResource().getProjectRelativePath().toString().equals("META-INF/MANIFEST.MF"))
-							return c;
-					} else {
-						return findManifest(newChildren);
-					}
-				}
-				return null;
-			}
-
 		}
 	}
 
+	/**
+	 * Toggles the nature if the given project containing henshin interpreter plug-in. <br>
+	 * This method will be executed one sekond in the future to avoid some changing problems.
+	 *
+	 * @param contents the input stream of the MANIFEST.MF file.
+	 * @param p the project
+	 */
 	private void toggleNature(InputStream contents, IProject p) {
-
 		Timer a = new Timer();
 		a.schedule(new TimerTask() {
+			boolean configured = false;
 
 			@Override
 			public void run() {
@@ -163,6 +181,8 @@ public class Start implements IStartup {
 					System.out.println("\nPath Builder " + (configured ? "activated " : "deactivated") + "  "
 							+ p.getName() + "\n");
 					configured = false;
+
+					contents.close();
 				} catch (IOException | CoreException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();

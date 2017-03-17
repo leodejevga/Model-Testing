@@ -17,10 +17,18 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.handlers.HandlerUtil;
 
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class AddRemoveNatureHandler.
+ */
 public class AddRemoveNatureHandler extends AbstractHandler {
 
+	/** The selection. */
 	private ISelection selection;
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands.ExecutionEvent)
+	 */
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		// TODO Auto-generated method stub
 		ISelection selection = HandlerUtil.getCurrentSelection(event);
@@ -62,14 +70,27 @@ public class AddRemoveNatureHandler extends AbstractHandler {
 
 	}
 
+	/**
+	 * Toggle nature.<br><br>
+	 * Same as: <br>
+	 * <code>toggleNature(project, null);</code>
+	 *
+	 * @param project the project
+	 * @return true, if successful
+	 * @throws CoreException the core exception
+	 * @see #toggleNature(IProject, Boolean)
+	 */
 	private static boolean toggleNature(IProject project) throws CoreException {
 		return toggleNature(project, null);
 	}
 	
 	/**
-	 * Toggles sample nature on a project
+	 * Toggles sample nature on a project.
 	 *
 	 * @param project to have sample nature added or removed
+	 * @param enable to enable the nature for given project. If <b>true</b> nature will be enabled, <b>false</b> nature will be disabled, <b>null</b> nature will be toggled
+	 * @return true, if successful
+	 * @throws CoreException the core exception
 	 */
 	public static boolean toggleNature(IProject project, Boolean enable) throws CoreException {
 		IProjectDescription description = project.getDescription();
