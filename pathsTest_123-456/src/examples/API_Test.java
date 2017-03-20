@@ -80,7 +80,7 @@ public class API_Test {
 		// should have an error marker!
 		HenshinResourceSet resourceSetDirectPathDirectoryWRONG = new HenshinResourceSet("files/bAAAAnk"); 
 		// should have an error marker!
-		HenshinResourceSet resourceSetDirectPathPartsWRONG1 = new HenshinResourceSet("fiLLLes/"  + "bank");
+		HenshinResourceSet resourceSetDirectPathPartsWRONG1 = new HenshinResourceSet("fiLLLes/"  + "bank"); 
 		// should have an error marker!
 		HenshinResourceSet resourceSetDirectPathPartsWRONG2 = new HenshinResourceSet("files/"+"bAAAnk");
 		

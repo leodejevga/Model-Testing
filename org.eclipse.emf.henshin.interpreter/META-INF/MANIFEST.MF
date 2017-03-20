@@ -7,12 +7,20 @@ Bundle-Version: 1.5.0.qualifier
 Bundle-Localization: plugin
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
-Require-Bundle: org.eclipse.emf.ecore.xmi;bundle-version="2.5.0",
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.emf.ecore.xmi;bundle-version="2.5.0",
  org.eclipse.emf.ecore.change;bundle-version="2.5.0";visibility:=reexport,
- org.eclipse.emf.henshin.model;bundle-version="0.9.0";visibility:=reexport
+ org.eclipse.emf.henshin.model;bundle-version="0.9.0";visibility:=reexport,
+ org.eclipse.ui
 Export-Package: org.eclipse.emf.henshin.interpreter,
  org.eclipse.emf.henshin.interpreter.impl,
  org.eclipse.emf.henshin.interpreter.info,
  org.eclipse.emf.henshin.interpreter.matching.conditions,
  org.eclipse.emf.henshin.interpreter.matching.constraints,
  org.eclipse.emf.henshin.interpreter.util
+Import-Package: org.eclipse.core.commands,
+ org.eclipse.core.resources,
+ org.eclipse.core.runtime;version="3.5.0",
+ org.eclipse.jface.viewers,
+ org.eclipse.ui,
+ org.eclipse.ui.handlers

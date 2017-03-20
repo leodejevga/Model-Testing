@@ -21,12 +21,7 @@
 			</arguments>
 		</buildCommand>
 		<buildCommand>
-			<name>test.sampleBuilder</name>
-			<arguments>
-			</arguments>
-		</buildCommand>
-		<buildCommand>
-			<name>org.eclipse.emf.henshin.paths.Builder</name>
+			<name>org.eclipse.emf.henshin.interpreter.mark.Builder</name>
 			<arguments>
 			</arguments>
 		</buildCommand>
@@ -34,7 +29,6 @@
 	<natures>
 		<nature>org.eclipse.jdt.core.javanature</nature>
 		<nature>org.eclipse.pde.PluginNature</nature>
-		<nature>test.sampleNature</nature>
-		<nature>org.eclipse.emf.henshin.paths.Nature</nature>
+		<nature>org.eclipse.emf.henshin.interpreter.mark.Nature</nature>
 	</natures>
 </projectDescription>
