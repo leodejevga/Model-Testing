@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         id="org.eclipse.emf.henshin.interpreter.mark.Builder"
+         name="Paths Builder"
+         point="org.eclipse.core.resources.builders">
+      <builder
+            hasNature="true">
+         <run
+               class="org.eclipse.emf.henshin.interpreter.mark.Builder">
+         </run>
+      </builder>
+   </extension>
+   <extension
+         id="org.eclipse.emf.henshin.interpreter.mark.Nature"
+         name="Paths Nature"
+         point="org.eclipse.core.resources.natures">
+      <runtime>
+         <run
+               class="org.eclipse.emf.henshin.interpreter.mark.Nature">
+         </run>
+      </runtime>
+      <builder
+            id="org.eclipse.emf.henshin.interpreter.mark.Builder">
+      </builder>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <category
+            id="org.eclipse.emf.henshin.interpreter.mark.Nature.category"
+            name="Paths Nature commands">
+      </category>
+      <command
+            categoryId="org.eclipse.emf.henshin.interpreter.mark.Nature.category"
+            defaultHandler="org.eclipse.emf.henshin.interpreter.mark.AddRemoveNatureHandler"
+            id="org.eclipse.emf.henshin.interpreter.mark.addRemoveNature"
+            name="Add/RemovePaths Nature">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            allPopups="false"
+            locationURI="popup:org.eclipse.ui.projectConfigure?after=additions">
+         <command
+               commandId="org.eclipse.emf.henshin.interpreter.mark.addRemoveNature"
+               label="Disable Path builder"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="selection">
+                  <count
+                        value="1">
+                  </count>
+                  <iterate>
+                     <adapt
+                           type="org.eclipse.core.resources.IProject">
+                        <test
+                              property="org.eclipse.core.resources.projectNature"
+                              value="org.eclipse.emf.henshin.interpreter.mark.Nature">
+                        </test>
+                     </adapt>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+         <command
+               commandId="org.eclipse.emf.henshin.interpreter.mark.addRemoveNature"
+               label="Enable Path builder"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="selection">
+                  <count
+                        value="1">
+                  </count>
+                  <iterate>
+                     <adapt
+                           type="org.eclipse.core.resources.IProject">
+                        <not>
+                           <test
+                                 property="org.eclipse.core.resources.projectNature"
+                                 value="org.eclipse.emf.henshin.interpreter.mark.Nature">
+                           </test>
+                        </not>
+                     </adapt>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+      </menuContribution>
+   </extension>
+   <extension
+         id="org.eclipse.emf.henshin.interpreter.mark.henshinPathProblem"
+         name="Path Problem"
+         point="org.eclipse.core.resources.markers">
+      <super
+            type="org.eclipse.core.resources.problemmarker">
+      </super>
+      <persistent
+            value="true">
+      </persistent>
+   </extension>
+   <extension
+         point="org.eclipse.ui.startup">
+      <startup
+            class="org.eclipse.emf.henshin.interpreter.mark.Start">
+      </startup>
+   </extension>
+
+</plugin>
