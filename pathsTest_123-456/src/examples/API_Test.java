@@ -34,6 +34,7 @@ public class API_Test {
 	public static final String staticNameInstanceWRONG2 = "example-bank.xMMMi";
 	public static final String staticCreateAccountWRONG = "createAccOOOunt";
 	public static final String staticClientWRONG = "cliEEEEnt";
+	public static final String staticFiveStringWRONG = "5"; 
 	public static final String staticFiveWRONG = "five";
 	public static final String staticNewAccountWrong = "newAccOOOOunt"; 
 	
@@ -179,6 +180,8 @@ public class API_Test {
 		// should have an error marker! 
 		staticRuleApp.setParameterValue(staticClientWRONG, "Alice");
 		staticRuleApp.setParameterValue("accountId", staticFive);
+		// should have an error marker!
+		staticRuleApp.setParameterValue("accountId", staticFiveStringWRONG);
 		// should have an error marker!
 		staticRuleApp.setParameterValue("accountId", staticFiveWRONG);
 		staticRuleApp.getResultParameterValue(staticNewAccount);
