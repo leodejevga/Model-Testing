@@ -11,6 +11,7 @@ import org.eclipse.emf.henshin.model.Unit;
 import org.eclipse.emf.henshin.model.resource.HenshinResourceSet;
 
 public class API_Test {
+	public static final int test = 1;
 	public static final String staticPathDirectoryWRONG1 = "files/bAAAnk";
 
 	public static final String staticPathDirectory = "files/bank";
@@ -27,7 +28,7 @@ public class API_Test {
 	
 	public static final String staticPathDirectoryWRONG = "files/bAAAnk";
 	public static final String staticPathPart1WRONG = "fiLLLes/";
-	public static final String staticPathPart2WRONG = "bAAAnk";
+	public static final String staticPathPart2WRONG = "bAAAnk"; 
 	public static final String staticNameModuleWRONG1 = "bAAAnk.henshin";
 	public static final String staticNameModuleWRONG2 = "bank.hEEEnshin";
 	public static final String staticNameInstanceWRONG1 = "exAAAAmple-bank.xmi";
@@ -35,7 +36,8 @@ public class API_Test {
 	public static final String staticCreateAccountWRONG = "createAccOOOunt";
 	public static final String staticClientWRONG = "cliEEEEnt";
 	public static final String staticFiveWRONG = "five";
-	public static final String staticNewAccountWrong = "newAccOOOOunt"; 
+	public static final String staticNewAccountWrong = "newAccOOOOunt";
+	
 	
 	// local before global check
 	String localPathDirectory = "files/bAAAAnk";
@@ -73,6 +75,8 @@ public class API_Test {
 		String localClientWRONG = "cliEEEEnt";
 		String localFiveWRONG = "five";
 		String localNewAccountWrong = "newAccOOOOunt";
+		HenshinResourceSet resourceSetStaticPathDirectory = new HenshinResourceSet(staticPathDirectory); 
+		HenshinResourceSet resourceSetStaticPathPartsWRONG2 = new HenshinResourceSet(staticPathPart1+staticPathPart2WRONG);
  
 		HenshinResourceSet resourceSetDirectPathDirectory = new HenshinResourceSet("files/bank");
 		
@@ -80,12 +84,12 @@ public class API_Test {
 		// should have an error marker!
 		HenshinResourceSet resourceSetDirectPathDirectoryWRONG = new HenshinResourceSet("files/bAAAAnk"); 
 		// should have an error marker!
-		HenshinResourceSet resourceSetDirectPathPartsWRONG1 = new HenshinResourceSet("fiLLLes/"  + "bank"); 
+		HenshinResourceSet resourceSetDirectPathPartsWRONG1 = new HenshinResourceSet("fiLLLes/"  + "bank");
 		// should have an error marker!
 		HenshinResourceSet resourceSetDirectPathPartsWRONG2 = new HenshinResourceSet("files/"+"bAAAnk");
 		
 
-		HenshinResourceSet resourceSetStaticPathDirectory = new HenshinResourceSet(staticPathDirectory);
+//		HenshinResourceSet resourceSetStaticPathDirectory = new HenshinResourceSet(staticPathDirectory);
 		HenshinResourceSet resourceSetStaticPathParts = new HenshinResourceSet(staticPathPart1+staticPathPart2);
 		// should have an error marker!
 		HenshinResourceSet resourceSetStaticPathDirectoryWRONG = new HenshinResourceSet(staticPathDirectoryWRONG);
@@ -172,12 +176,14 @@ public class API_Test {
 		RuleApplication staticRuleApp = new RuleApplicationImpl(engine);
 		staticRuleApp.setEGraph(graphStaticPathDirectory);
 		
+
+		
 		Unit staticCreateAccountUnit = moduleStaticPathDirectory.getUnit(staticCreateAccount);
-		staticRuleApp.setUnit(staticCreateAccountUnit); 
+		staticRuleApp.setUnit(staticCreateAccountUnit);
 		staticRuleApp.setParameterValue(staticClient, "Alice");  
 		
 		// should have an error marker! 
-		staticRuleApp.setParameterValue(staticClientWRONG, "Alice");
+		staticRuleApp.setParameterValue(staticClientWRONG, "Alice"); 
 		staticRuleApp.setParameterValue("accountId", staticFive);
 		// should have an error marker!
 		staticRuleApp.setParameterValue("accountId", staticFiveWRONG);
@@ -203,20 +209,26 @@ public class API_Test {
 		// should have an error marker!
 		Unit localCreateAccountUnitWRONG = moduleLocalPathDirectory.getUnit(localCreateAccountWRONG);
 		
-		
+		String five = "5";
+		int f = 5; 
+		Integer s = 6; 
 		RuleApplication directRuleApp = new RuleApplicationImpl(engine);
 		directRuleApp.setEGraph(graphDirectPathDirectory);
-		Unit directCreateAccountUnit = moduleDirectPathDirectory.getUnit("createAccount"); 
-		directRuleApp.setUnit(staticCreateAccountUnit);		
+		Unit directCreateAccountUnit = moduleDirectPathDirectory.getUnit("createAccount");
+		directRuleApp.setUnit(directCreateAccountUnit);
 		directRuleApp.setParameterValue("client", "Alice");
 		// should have an error marker!
-		directRuleApp.setParameterValue("cliEEEEnt", "Alice");
-		directRuleApp.setParameterValue("accountId", 5);
+		directRuleApp.setParameterValue("client", f);  //Wenn string erwartet wird aber einen andere Typ bekommt, kann er nicht übeprüfen obs richtig ist
+		directRuleApp.setParameterValue("accountId", five);
+		directRuleApp.setParameterValue("accountId", f);
+		directRuleApp.setParameterValue("accountId", s);
+		directRuleApp.setParameterValue("accountId", 0.5);
 		// should have an error marker!
-		directRuleApp.setParameterValue("accountId", "five"); 
+		directRuleApp.setParameterValue("accountId", "five");
 		directRuleApp.getResultParameterValue("newAccount");
 		// should have an error marker!
-		directRuleApp.getResultParameterValue("newAccOOOunt");
+		directRuleApp.getResultParameterValue("newAccOOOunt"); 
+		directRuleApp.getResultParameterValue("accountId");
 		// should have an error marker!
 		Unit directCreateAccountUnitWRONG = moduleDirectPathDirectory.getUnit("createAccOOOunt");
 		
