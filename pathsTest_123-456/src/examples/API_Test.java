@@ -76,8 +76,7 @@ public class API_Test {
 		String localClientWRONG = "cliEEEEnt";
 		String localFiveWRONG = "five";
 		String localNewAccountWrong = "newAccOOOOunt";
-		HenshinResourceSet resourceSetStaticPathDirectory = new HenshinResourceSet(staticPathDirectory); 
-		HenshinResourceSet resourceSetStaticPathPartsWRONG2 = new HenshinResourceSet(staticPathPart1+staticPathPart2WRONG);
+		HenshinResourceSet resourceSetStaticPathDirectory = new HenshinResourceSet(staticPathDirectory);
  
 		HenshinResourceSet resourceSetDirectPathDirectory = new HenshinResourceSet("files/bank");
 		
@@ -221,7 +220,7 @@ public class API_Test {
 		directRuleApp.setUnit(directCreateAccountUnit);
 		directRuleApp.setParameterValue("client", "Alice");
 		// should have an error marker!
-		directRuleApp.setParameterValue("client", f);  //Wenn string erwartet wird aber einen andere Typ bekommt, kann er nicht übeprüfen obs richtig ist
+		directRuleApp.setParameterValue("client", s);  //Wenn string erwartet wird aber einen andere Typ bekommt, kann er nicht übeprüfen obs richtig ist
 		directRuleApp.setParameterValue("accountId", five);
 		directRuleApp.setParameterValue("accountId", f);
 		directRuleApp.setParameterValue("accountId", s);
@@ -230,7 +229,7 @@ public class API_Test {
 		directRuleApp.setParameterValue("accountId", "five");
 		directRuleApp.getResultParameterValue("newAccount");
 		// should have an error marker!
-		directRuleApp.getResultParameterValue("newAccOOOunt"); 
+		directRuleApp.getResultParameterValue("newAccOOOunt");
 		directRuleApp.getResultParameterValue("accountId");
 		// should have an error marker!
 		Unit directCreateAccountUnitWRONG = moduleDirectPathDirectory.getUnit("createAccOOOunt");
