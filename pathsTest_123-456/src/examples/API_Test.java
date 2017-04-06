@@ -186,7 +186,7 @@ public class API_Test {
 		staticRuleApp.setParameterValue(staticClientWRONG, "Alice"); 
 		staticRuleApp.setParameterValue("accountId", staticFive);
 		// should have an error marker!
-		staticRuleApp.setParameterValue("accountId", staticFiveStringWRONG);
+		staticRuleApp.setParameterValue("accountId", staticFiveStringWRONG); 
 		// should have an error marker!
 		staticRuleApp.setParameterValue("accountId", staticFiveWRONG);
 		staticRuleApp.getResultParameterValue(staticNewAccount);
@@ -227,10 +227,10 @@ public class API_Test {
 		directRuleApp.setParameterValue("accountId", 0.5);
 		// should have an error marker!
 		directRuleApp.setParameterValue("accountId", "five");
-		directRuleApp.getResultParameterValue("newAccount");
+		directRuleApp.getResultParameterValue("newAccount"); 
 		// should have an error marker!
-		directRuleApp.getResultParameterValue("newAccOOOunt");
-		directRuleApp.getResultParameterValue("accountId");
+		directRuleApp.getResultParameterValue("newAcc" + "OOOunt");  
+		directRuleApp.getResultParameterValue("cli" + "ent");
 		// should have an error marker!
 		Unit directCreateAccountUnitWRONG = moduleDirectPathDirectory.getUnit("createAccOOOunt");
 		
