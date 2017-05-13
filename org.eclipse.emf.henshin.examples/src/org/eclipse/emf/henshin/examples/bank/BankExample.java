@@ -37,9 +37,9 @@ public class BankExample {
 	final static String PATH = "src/org/eclipse/emf/henshin/examples/bank"; 
 	
 	public static void run(String path, boolean saveResult) {
-		path = "src/org/eclipse/emf/henshin/examples/bank"; 
+		path = "examples/bank"; 
 		// Create a resource set with a base directory:
-		HenshinResourceSet r2 = new HenshinResourceSet(path); 
+		HenshinResourceSet r2 = new HenshinResourceSet(path);
 		HenshinResourceSet r1= new HenshinResourceSet("src/org/eclipse/emf/henshin/examples/bank"); 
 		
 		// Load the module:
@@ -47,9 +47,9 @@ public class BankExample {
 		Module m1 = r2.getModule("bank.henshin", false);
 		
 		Module m2 = r1.getModule(re, false);
-
+		
 		// Load the example model into an EGraph:
-		String s1= "example-banks.xmi"; 
+		String s1= "example-banks.xmi";
 		EGraph g2 = new EGraphImpl(r1.getResource(s1)); 
 		EGraph g1 = new EGraphImpl(r1.getResource("example-bank.xmi")); 
 		
@@ -68,7 +68,7 @@ public class BankExample {
 		createAccountApp.setParameterValue("client", "Alice");
 		createAccountApp.setParameterValue("clients", "Alice");
 		createAccountApp.setParameterValue("accountId", 5);
-		createAccountApp.setParameterValue("accountId", "5"); 
+		createAccountApp.setParameterValue("accountId", "5");
 		if (!createAccountApp.execute(null)) { 
 			throw new RuntimeException("Error creating account for Alice");
 		}
